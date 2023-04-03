@@ -3,12 +3,19 @@ package org.firstinspires.ftc.teamcode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.util.RobotLog
 import kotlinx.coroutines.*
+import org.firstinspires.ftc.teamcode.event.WatchList
+import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
+import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
+import org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration.LIGamepad
+import org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration.LIHardwareMap
+import org.firstinspires.ftc.teamcode.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.util.Timer
 import org.firstinspires.ftc.teamcode.util.TriggerLock
 
-open class LOpMode(
-        val runBlock: suspend RunScope.() -> Unit
-) : OpMode(), OpBaseScope {
+open class LOpMode<T: Any>(
+        private val robotSpec: IRobot<T>,
+        val runBlock: suspend LOpMode<T>.RunScope.() -> Unit
+) : OpMode(), OpBaseScope<T> {
 
     val scope = CoroutineScope(Dispatchers.Default)
     private var coroutineJob: Job? = null
@@ -26,10 +33,18 @@ open class LOpMode(
 
     private val stopHandles = mutableSetOf<CloseScope.() -> Unit>()
 
+    override val gamepadA = Gamepad(LIGamepad(gamepad1))
+    override val gamepadB = Gamepad(LIGamepad(gamepad2))
+    override val withTelemetry = WithTelemetry(telemetry)
+
+    final override lateinit var robot: T
+        private set
+
     /**
      * This method will be called once when the INIT button is pressed.
      */
     override fun init() {
+        robot = robotSpec.impl(LIHardwareMap(hardwareMap))
         timerSinceInit.isTiming = true
         coroutineJob = scope.launch {
             runBlock(RunScope())
@@ -121,12 +136,12 @@ open class LOpMode(
 
 
     inner class RunScope :
-            OpBaseScope by this,
+            OpBaseScope<T> by this,
             CoroutineScope by scope {
         suspend fun waitForStart() = startTrigger.wait()
         fun cleanupOnStop(block: CloseScope.() -> Unit) = stopHandles.add(block)
 
-        fun createLoop(condition: () -> Boolean = { duringRun }, block: LoopScope.() -> Unit) {
+        fun createLoop(condition: () -> Boolean = { duringRun }, block: LoopScope<T>.() -> Unit) {
             launch {
                 val loopScope = LoopScopeImpl()
                 while (condition()) {
@@ -137,13 +152,14 @@ open class LOpMode(
                     } catch (_: LoopScope.Break) {
                         break // break out of outer loop
                     }
-                    loopScope.updateDT()
+                    loopScope.updateAtEndOfLoop()
                 }
             }
         }
     }
 
-    interface LoopScope : OpBaseScope {
+    interface LoopScope<T> : OpBaseScope<T> {
+        fun <K: WatchList.Watchable> watches(gen: (WatchList)->K, block: (K) -> Unit)
         object Break : Throwable()
         object Continue : Throwable()
 
@@ -152,11 +168,20 @@ open class LOpMode(
         val CONTINUE: Nothing
     }
 
-    inner class LoopScopeImpl : LoopScope, OpBaseScope by this {
+    inner class LoopScopeImpl : LoopScope<T>, OpBaseScope<T> by this {
+        private val watchList = WatchList()
+        override fun <K: WatchList.Watchable> watches(gen: (WatchList)->K, block: (K) -> Unit) {
+            if (isFirstLoop)
+                block(gen(watchList))
+        }
+
         private var tLast = timeSinceInit
-        fun updateDT() {
+        private var isFirstLoop = true
+        fun updateAtEndOfLoop() {
             dt = timeSinceInit - tLast
             tLast = timeSinceInit
+            isFirstLoop = false
+            watchList.tick()
         }
 
         override var dt = 0.0
@@ -166,16 +191,21 @@ open class LOpMode(
         override val CONTINUE get() = throw LoopScope.Continue
     }
 
-    inner class CloseScope : OpBaseScope by this {
+    inner class CloseScope : OpBaseScope<T> by this {
 
     }
 }
 
-interface OpBaseScope {
+interface OpBaseScope<T> {
     val duringRun: Boolean
     val duringInit: Boolean
     val isStarted: Boolean
     val wasStopRequested: Boolean
     val timeSinceStart: Double
     val timeSinceInit: Double
+
+    val robot: T
+    val gamepadA: Gamepad
+    val gamepadB: Gamepad
+    val withTelemetry: WithTelemetry
 }
