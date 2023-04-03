@@ -19,9 +19,11 @@ class Gamepad(
             left = gamepad::triggerLeft,
             right = gamepad::triggerRight,
     )
+    private val bumperLeft = Button(gamepad::bumperLeft)
+    private val bumperRight = Button(gamepad::bumperRight)
     val bumper = LateralInput(
-            left = gamepad::bumperLeft,
-            right = gamepad::bumperRight,
+            left = this::bumperLeft,
+            right = this::bumperRight,
     )
     private val stickLeft = Stick(gamepad::stickLeftButton, gamepad::stickLeft)
     private val stickRight = Stick(gamepad::stickRightButton, gamepad::stickRight)
@@ -29,6 +31,14 @@ class Gamepad(
             left = this::stickLeft,
             right = this::stickRight,
     )
+
+    inner class DPad {
+        val up = Button(gamepad::dpadUp)
+        val down = Button(gamepad::dpadDown)
+        val left = Button(gamepad::dpadLeft)
+        val right = Button(gamepad::dpadRight)
+    }
+    val dpad = DPad()
 
 
     class Button(isHeld: KProperty0<Boolean>) {
