@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.ftcGlue.ftcImpl
+package org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration
 
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
