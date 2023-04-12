@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration
+package org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
 
-class LIDCMotor(private val dcMotor: DcMotor) : IDCMotor {
+class FTCDCMotor(private val dcMotor: DcMotor) : IDCMotor {
     override var power by dcMotor::power
     override val pos by dcMotor::currentPosition
 

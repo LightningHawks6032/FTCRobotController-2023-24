@@ -32,5 +32,22 @@ class TestOp : LOpMode<RobotA.Impl>(RobotA.instance, {
             ln("hello world")
             ln("the thingy", triggerHeldAmt)
         }
+
+        robot.motor.power = triggerHeldAmt
     }
-})
+
+    createLoop {
+        watches({ gamepadA.dpad.up.Watch(it) }) {
+            it.pressed.bind {
+                robot.doThing()
+            }
+        }
+    }
+
+    cleanupOnStop {
+        withTelemetry {
+            ln("it end")
+        }
+    }
+
+}, FinishedBehaviour.KEEP_ALIVE_UNTIL_LOOPS_END)

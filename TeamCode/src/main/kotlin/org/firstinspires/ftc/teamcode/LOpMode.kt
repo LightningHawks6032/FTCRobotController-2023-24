@@ -6,15 +6,17 @@ import kotlinx.coroutines.*
 import org.firstinspires.ftc.teamcode.event.WatchList
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
-import org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration.LIGamepad
-import org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration.LIHardwareMap
+import org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware.FTCGamepad
+import org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware.FTCHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.util.Timer
 import org.firstinspires.ftc.teamcode.util.TriggerLock
+import org.firstinspires.ftc.teamcode.util.ValueLock
 
-open class LOpMode<T: Any>(
+open class LOpMode<T : Any>(
         private val robotSpec: IRobot<T>,
-        val runBlock: suspend LOpMode<T>.RunScope.() -> Unit
+        val runBlock: suspend LOpMode<T>.RunScope.() -> Unit,
+        private val userCodeFinishedBehaviour: FinishedBehaviour = FinishedBehaviour.KEEP_ALIVE_UNTIL_LOOPS_END
 ) : OpMode(), OpBaseScope<T> {
 
     val scope = CoroutineScope(Dispatchers.Default)
@@ -33,21 +35,34 @@ open class LOpMode<T: Any>(
 
     private val stopHandles = mutableSetOf<CloseScope.() -> Unit>()
 
-    override val gamepadA = Gamepad(LIGamepad(gamepad1))
-    override val gamepadB = Gamepad(LIGamepad(gamepad2))
+    override val gamepadA = Gamepad(FTCGamepad(gamepad1))
+    override val gamepadB = Gamepad(FTCGamepad(gamepad2))
     override val withTelemetry = WithTelemetry(telemetry)
 
     final override lateinit var robot: T
         private set
 
+    /** Locked when loops are running */
+    private val runningLoopCountLock = ValueLock(0) { it > 0 }
+
     /**
      * This method will be called once when the INIT button is pressed.
      */
     override fun init() {
-        robot = robotSpec.impl(LIHardwareMap(hardwareMap))
+        robot = robotSpec.impl(FTCHardwareMap(hardwareMap))
         timerSinceInit.isTiming = true
         coroutineJob = scope.launch {
             runBlock(RunScope())
+
+            when (userCodeFinishedBehaviour) {
+                FinishedBehaviour.STOP -> {}
+                FinishedBehaviour.KEEP_ALIVE_INDEFINITELY -> {
+                    while (true) yield()
+                }
+                FinishedBehaviour.KEEP_ALIVE_UNTIL_LOOPS_END -> {
+                    runningLoopCountLock.wait()
+                }
+            }
         }.also {
             it.invokeOnCompletion { e ->
                 when (e) {
@@ -134,6 +149,11 @@ open class LOpMode<T: Any>(
         }
     }
 
+    enum class FinishedBehaviour {
+        KEEP_ALIVE_UNTIL_LOOPS_END,
+        STOP,
+        KEEP_ALIVE_INDEFINITELY,
+    }
 
     inner class RunScope :
             OpBaseScope<T> by this,
@@ -143,23 +163,29 @@ open class LOpMode<T: Any>(
 
         fun createLoop(condition: () -> Boolean = { duringRun }, block: LoopScope<T>.() -> Unit) {
             launch {
-                val loopScope = LoopScopeImpl()
-                while (condition()) {
-                    try {
-                        block(loopScope)
-                    } catch (_: LoopScope.Continue) {
-                        // let the loop continue to next iteration
-                    } catch (_: LoopScope.Break) {
-                        break // break out of outer loop
+                try {
+                    runningLoopCountLock.mutate { it + 1 }
+                    val loopScope = LoopScopeImpl()
+                    while (condition()) {
+                        try {
+                            block(loopScope)
+                        } catch (_: LoopScope.Continue) {
+                            // let the loop continue to next iteration
+                        } catch (_: LoopScope.Break) {
+                            break // break out of outer loop
+                        }
+                        loopScope.updateAtEndOfLoop()
                     }
-                    loopScope.updateAtEndOfLoop()
+                } finally {
+                    runningLoopCountLock.mutate { it - 1 }
                 }
             }
         }
     }
 
     interface LoopScope<T> : OpBaseScope<T> {
-        fun <K: WatchList.Watchable> watches(gen: (WatchList)->K, block: (K) -> Unit)
+        fun <K : WatchList.Watchable> watches(gen: (WatchList) -> K, block: (K) -> Unit)
+
         object Break : Throwable()
         object Continue : Throwable()
 
@@ -170,7 +196,7 @@ open class LOpMode<T: Any>(
 
     inner class LoopScopeImpl : LoopScope<T>, OpBaseScope<T> by this {
         private val watchList = WatchList()
-        override fun <K: WatchList.Watchable> watches(gen: (WatchList)->K, block: (K) -> Unit) {
+        override fun <K : WatchList.Watchable> watches(gen: (WatchList) -> K, block: (K) -> Unit) {
             if (isFirstLoop)
                 block(gen(watchList))
         }

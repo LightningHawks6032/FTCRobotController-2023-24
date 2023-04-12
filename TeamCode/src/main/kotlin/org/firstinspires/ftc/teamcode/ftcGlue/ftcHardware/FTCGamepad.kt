@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration
+package org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware
 
 import com.qualcomm.robotcore.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.ftcGlue.IGamepad
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.toDouble
 
-class LIGamepad(
+class FTCGamepad(
         gamepad: Gamepad,
 ) : IGamepad {
     override val x by gamepad::x

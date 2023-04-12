@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.ftcGlue.liveIntegration
+package org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware
 
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 
-class LIHardwareMap(val hardwareMap: HardwareMap) : IHardwareMap {
+class FTCHardwareMap(val hardwareMap: HardwareMap) : IHardwareMap {
     override val dcMotors = DCMotorSubMap()
 
     inner class DCMotorSubMap : IHardwareMap.SubMap<IDCMotor> {
@@ -13,7 +13,7 @@ class LIHardwareMap(val hardwareMap: HardwareMap) : IHardwareMap {
         } catch (e: Throwable) {
             null
         }?.let {
-            LIDCMotor(it)
+            FTCDCMotor(it)
         }
     }
 }

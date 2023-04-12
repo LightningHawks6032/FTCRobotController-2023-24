@@ -13,6 +13,10 @@ class RobotA : IRobot<RobotA.Impl> {
         fun init() {
             // could do something here, just as an example
         }
+
+        fun doThing() {
+            motor.power = 1.0
+        }
     }
     override fun impl(hardwareMap: IHardwareMap) = Impl(hardwareMap)
 
