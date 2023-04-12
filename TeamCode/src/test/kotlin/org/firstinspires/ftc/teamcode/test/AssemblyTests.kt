@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.test
 
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
-import org.firstinspires.ftc.teamcode.test.ftcGlue.CIHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
+import org.firstinspires.ftc.teamcode.test.ftcGlue.CIHardwareMap
 import org.junit.Test
 
 class AssemblyTests {
@@ -26,8 +26,9 @@ class AssemblyTests {
     }
 
     inner class Assembly {
-        val motorA = Motor(ID_A)
-        val motorB = Motor(ID_B)
+        private val motorPhysicalSpec = Motor.PhysicalSpec.GOBILDA_5202_0002_0005
+        val motorA = Motor(ID_A,motorPhysicalSpec)
+        val motorB = Motor(ID_B,motorPhysicalSpec)
         inner class Impl(hardwareMap: IHardwareMap) {
             val motorA = this@Assembly.motorA.Impl(hardwareMap)
             val motorB = this@Assembly.motorB.Impl(hardwareMap)

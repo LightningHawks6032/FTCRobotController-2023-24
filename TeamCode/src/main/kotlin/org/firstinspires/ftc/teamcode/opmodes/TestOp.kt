@@ -21,19 +21,12 @@ class TestOp : LOpMode<RobotA.Impl>(RobotA.instance, {
     waitForStart()
 
     createLoop {
-        watches({ gamepadA.a.Watch(it) }) {
-            it.changed.bind { isHeld ->
-                robot.motor.power = if (isHeld) 1.0 else 0.0
-            }
-        }
         val triggerHeldAmt = gamepadA.trigger.let { it.left + it.right }
 
         withTelemetry {
             ln("hello world")
             ln("the thingy", triggerHeldAmt)
         }
-
-        robot.motor.power = triggerHeldAmt
     }
 
     createLoop {
