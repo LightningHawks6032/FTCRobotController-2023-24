@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware
 import com.qualcomm.robotcore.hardware.Gamepad
 import org.firstinspires.ftc.teamcode.ftcGlue.IGamepad
 import org.firstinspires.ftc.teamcode.util.Vec2
+import org.firstinspires.ftc.teamcode.util.delegate
 import org.firstinspires.ftc.teamcode.util.toDouble
 
 class FTCGamepad(
@@ -31,6 +32,6 @@ class FTCGamepad(
     override val bumperLeft by gamepad::left_bumper
     override val bumperRight by gamepad::right_bumper
 
-    override val triggerLeft by gamepad::left_trigger.toDouble()
-    override val triggerRight by gamepad::right_trigger.toDouble()
+    override val triggerLeft by gamepad::left_trigger.delegate().toDouble()
+    override val triggerRight by gamepad::right_trigger.delegate().toDouble()
 }

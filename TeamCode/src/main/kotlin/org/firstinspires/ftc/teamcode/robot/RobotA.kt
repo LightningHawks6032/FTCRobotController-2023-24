@@ -15,16 +15,22 @@ class RobotA : IRobot<RobotA.Impl> {
             ),
             MecanumDrive.Ids.default
     )
+    val encoder = Motor(
+            "enc",
+            Motor.PhysicalSpec.REV_THROUGH_BORE_ENCODER,
+            Motor.Config.default
+    )
 
     inner class Impl(hardwareMap: IHardwareMap) {
         val drive = this@RobotA.drive.Impl(hardwareMap)
+        val encoder = this@RobotA.encoder.Impl(hardwareMap)
 
         fun init() {
             // could do something here, just as an example
         }
 
         fun doThing() {
-            drive.power = Vec2Rot(Vec2(0.0,1.0),0.0)
+            drive.power = Vec2Rot(Vec2(0.0,1.0), -encoder.pos)
         }
     }
     override fun impl(hardwareMap: IHardwareMap) = Impl(hardwareMap)
