@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.test
+package org.firstinspires.ftc.teamcode.test.motion
 
 import org.firstinspires.ftc.teamcode.hardware.Motor
-import org.firstinspires.ftc.teamcode.hardware.commonAssembly.MecanumDrive
+import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.test.ftcGlue.CIHardwareMap
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot

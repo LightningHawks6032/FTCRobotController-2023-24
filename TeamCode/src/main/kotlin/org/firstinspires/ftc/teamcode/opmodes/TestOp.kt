@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.opmodes
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
+import org.firstinspires.ftc.teamcode.controlSystems.DriveController
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.Motor
-import org.firstinspires.ftc.teamcode.hardware.commonAssembly.MecanumDrive
+import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
+import org.firstinspires.ftc.teamcode.hardware.motion.TwoWheelOdometry
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
@@ -36,6 +38,8 @@ class TestOp : LOpMode<RobotA.Impl>(RobotA.instance, {
         }
     }
 
+    createLoop { robot.tick(dt) }
+
     createLoop {
         watches({ gamepadA.dpad.up.Watch(it) }) {
             it.pressed.bind {
@@ -59,6 +63,14 @@ class RobotA : IRobot<RobotA.Impl> {
             ),
             MecanumDrive.Ids.default
     )
+    val odo = TwoWheelOdometry(
+            Vec2Rot.zero,
+            6.0,
+            6.0,
+            Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
+            TwoWheelOdometry.ReversalPattern(),
+            TwoWheelOdometry.Ids.default
+    )
     val encoder = Motor(
             "enc",
             Motor.PhysicalSpec.REV_THROUGH_BORE_ENCODER,
@@ -66,15 +78,24 @@ class RobotA : IRobot<RobotA.Impl> {
     )
 
     inner class Impl(hardwareMap: IHardwareMap) {
-        private val drive = this@RobotA.drive.Impl(hardwareMap)
+        private val drive = DriveController(
+                this@RobotA.drive.Impl(hardwareMap),
+                this@RobotA.odo.also { it.Impl(hardwareMap) },
+        )
         private val encoder = this@RobotA.encoder.Impl(hardwareMap)
 
         fun init() {
+            println(encoder.pos)
             // could do something here, just as an example
         }
 
         fun doThing() {
-            drive.power = Vec2Rot(Vec2(0.0, 1.0), -encoder.pos)
+            println(encoder.pos)
+            drive.currentTarget = Vec2Rot(Vec2(Math.random(), Math.random()) * 12.0, 0.0)
+        }
+
+        fun tick(dt: Double) {
+            drive.tick(dt)
         }
     }
 

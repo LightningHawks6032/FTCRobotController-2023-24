@@ -3,11 +3,16 @@ package org.firstinspires.ftc.teamcode.test.ftcGlue
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.junit.Test
+import kotlin.reflect.KClass
 
 class CIHardwareMap : IHardwareMap {
     override val dcMotors: IHardwareMap.SubMap<IDCMotor> = SubMap { CIDCMotor() }
 
     val requested = mutableMapOf<String,Any?>()
+
+    // Can't do `getRaw` here, it doesn't make sense because it requires the IRL robot context
+    override fun <T : Any> getRaw(id: String, clazz: KClass<T>) = null
+
     inner class SubMap<T : Any>(val get: ()->T?) : IHardwareMap.SubMap<T> {
         private val requestedInSubMap = mutableMapOf<String,T>()
         override fun get(id: String) = requestedInSubMap[id] ?: get()?.also {

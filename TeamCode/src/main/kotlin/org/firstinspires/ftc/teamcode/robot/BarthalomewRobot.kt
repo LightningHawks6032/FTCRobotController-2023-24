@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.robot
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.Motor
-import org.firstinspires.ftc.teamcode.hardware.commonAssembly.MecanumDrive
+import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 class BarthalomewRobot : IRobot<BarthalomewRobot.Impl> {

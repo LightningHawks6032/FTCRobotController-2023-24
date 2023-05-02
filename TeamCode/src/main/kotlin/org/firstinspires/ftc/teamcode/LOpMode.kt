@@ -183,7 +183,8 @@ open class LOpMode<T : Any>(
                     val loopScope = LoopScopeImpl()
                     while (condition()) {
                         try {
-                            block(loopScope)
+                            if (loopScope.dt.isFinite() && loopScope.dt > 0.0)
+                                block(loopScope)
                         } catch (_: LoopScope.Continue) {
                             // let the loop continue to next iteration
                         } catch (_: LoopScope.Break) {

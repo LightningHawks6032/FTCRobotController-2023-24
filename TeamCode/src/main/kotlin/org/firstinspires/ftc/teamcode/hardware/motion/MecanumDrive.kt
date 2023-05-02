@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.hardware.commonAssembly
+package org.firstinspires.ftc.teamcode.hardware.motion
 
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
@@ -37,13 +37,13 @@ class MecanumDrive(
         }
     }
 
-    inner class Impl(hardwareMap: IHardwareMap) {
+    inner class Impl(hardwareMap: IHardwareMap) : DriveImpl {
         private val fr = frRef.Impl(hardwareMap)
         private val fl = flRef.Impl(hardwareMap)
         private val br = brRef.Impl(hardwareMap)
         private val bl = blRef.Impl(hardwareMap)
 
-        var power: Vec2Rot = Vec2Rot.zero
+        override var power: Vec2Rot = Vec2Rot.zero
             set(value) {
                 field = value
                 val (_,r) = value
