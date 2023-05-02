@@ -10,6 +10,7 @@ data class Vec2(
     operator fun plus(other: Vec2) = Vec2(this.x + other.x, this.y + other.y)
     operator fun minus(other: Vec2) = this + -other
     operator fun times(k: Double) = Vec2(x * k, y * k)
+    operator fun times(other: Vec2) = Vec2(this.x * other.x, this.y * other.y)
     operator fun unaryMinus() = this * -1.0
     operator fun div(other: Double) = this * (1.0 / other)
     /** Take the dot product between `this` and `other`. */

@@ -35,8 +35,8 @@ open class LOpMode<T : Any>(
 
     private val stopHandles = mutableSetOf<CloseScope.() -> Unit>()
 
-    override val gamepadA = Gamepad(FTCGamepad(gamepad1))
-    override val gamepadB = Gamepad(FTCGamepad(gamepad2))
+    override val gamepadA by lazy { Gamepad(FTCGamepad(gamepad1)) }
+    override val gamepadB by lazy { Gamepad(FTCGamepad(gamepad2)) }
     override val withTelemetry = WithTelemetry(telemetry)
 
     final override lateinit var robot: T
@@ -51,6 +51,7 @@ open class LOpMode<T : Any>(
     override fun init() {
         robot = robotSpec.impl(FTCHardwareMap(hardwareMap))
         timerSinceInit.isTiming = true
+        duringInit = true
         coroutineJob = scope.launch {
             runBlock(RunScope())
 
@@ -92,6 +93,8 @@ open class LOpMode<T : Any>(
      */
     override fun start() {
         timerSinceStart.isTiming = true
+        duringRun = true
+        duringInit = false
         startTrigger.unlock()
     }
 
@@ -141,6 +144,7 @@ open class LOpMode<T : Any>(
 
         timerSinceStart.isTiming = false
         timerSinceInit.isTiming = false
+        duringRun = false
         runBlocking {
             coroutineJob!!.cancelAndJoin()
         }
@@ -161,10 +165,21 @@ open class LOpMode<T : Any>(
         suspend fun waitForStart() = startTrigger.wait()
         fun cleanupOnStop(block: CloseScope.() -> Unit) = stopHandles.add(block)
 
-        fun createLoop(condition: () -> Boolean = { duringRun }, block: LoopScope<T>.() -> Unit) {
-            launch {
+        suspend fun createLoop(
+                condition: () -> Boolean = { duringRun },
+                block: LoopScope<T>.() -> Unit,
+        ) {
+            internalCreateLoop(this, condition, block)
+        }
+
+        private suspend fun internalCreateLoop(
+                scope: CoroutineScope,
+                condition: () -> Boolean = { duringRun },
+                block: LoopScope<T>.() -> Unit,
+        ) {
+            runningLoopCountLock.mutate { it + 1 }
+            scope.launch {
                 try {
-                    runningLoopCountLock.mutate { it + 1 }
                     val loopScope = LoopScopeImpl()
                     while (condition()) {
                         try {
