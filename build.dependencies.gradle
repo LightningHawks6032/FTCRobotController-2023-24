@@ -21,6 +21,15 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+
+    ["ktor-server-core","ktor-server-netty","ktor-server-websockets"].each {
+        implementation "io.ktor:$it:2.3.1", {
+            exclude group: 'org.slf4j'
+        }
+    }
+
+    implementation "org.graalvm.js:js:22.3.2"
 
     testImplementation 'junit:junit:4.12'
 }
