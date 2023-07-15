@@ -6,7 +6,7 @@ class WithTelemetry(
         private val telemetry: Telemetry,
 ) {
     inner class Scope {
-        fun ln(ln: String) = telemetry.addLine(ln)
+        fun ln(ln: String) { telemetry.addLine(ln) }
         fun ln(ln: String, v: Any) = ln("$ln: $v")
     }
     operator fun invoke(block: Scope.()->Unit) {

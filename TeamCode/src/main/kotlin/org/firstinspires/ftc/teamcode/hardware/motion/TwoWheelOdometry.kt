@@ -13,7 +13,7 @@ class TwoWheelOdometry(
         spec: Motor.PhysicalSpec,
         reversalPattern: ReversalPattern,
         ids: Ids,
-) : Odometry() {
+) : IOdometry() {
     val xReader = Motor(ids.x, spec, Motor.Config { useEncoder = true; reversed = reversalPattern.x })
     val yReader = Motor(ids.y, spec, Motor.Config { useEncoder = true; reversed = reversalPattern.y })
     val imu = IMU(ids.imu, IMU.SpinAxis.VERTICAL)
@@ -35,7 +35,27 @@ class TwoWheelOdometry(
     }
 
 
-    override fun readDeltaFromImpl(dt: Double) = currentImpl?.readDelta(dt)
+    override fun tick(dt: Double) {
+        val delta = currentImpl?.readDelta(dt)
+        val transform = robotLocTransform()
+
+        val prevVel = vel
+        vel = transform.localToGlobalVel(delta?.vel ?: Vec2Rot.zero)
+        pos += transform.localToGlobalVel(delta?.dPos ?: Vec2Rot.zero)
+        acc = (vel - prevVel) / dt
+    }
+
+    override fun assertPosition(newPos: Vec2Rot) {
+        pos = newPos
+        vel = Vec2Rot.zero
+        acc = Vec2Rot.zero
+    }
+
+    override fun nudge(newPos: Vec2Rot) {
+        acc = acc.transformP { it.rotate(newPos.r - pos.r) }
+        vel = vel.transformP { it.rotate(newPos.r - pos.r) }
+        pos = newPos
+    }
 
     private var currentImpl: Impl? = null
 

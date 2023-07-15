@@ -60,10 +60,3 @@ data class Vec2Rot(
         val zero = Vec2Rot(Vec2.zero, 0.0)
     }
 }
-
-
-fun k() {
-    val a = Vec2Rot(Vec2(0.0, 0.0), 0.0)
-
-    a.transformP { it.rotate(1.0) }
-}

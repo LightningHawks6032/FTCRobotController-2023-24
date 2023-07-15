@@ -19,6 +19,7 @@ class MecanumTests {
                 spec,
                 MecanumDrive.ReversalPattern(),
                 ids,
+                Vec2Rot.zero,
         ).Impl(hardware)
 
         // get motor references
@@ -159,6 +160,7 @@ class MecanumTests {
                 spec,
                 reversePattern,
                 ids,
+                Vec2Rot.zero,
         ).Impl(hardware)
 
         // get motor references
