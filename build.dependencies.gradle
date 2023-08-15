@@ -29,7 +29,7 @@ dependencies {
         }
     }
 
-    implementation "org.graalvm.js:js:22.3.2"
+//    implementation "org.graalvm.js:js:22.3.2"
 
     testImplementation 'junit:junit:4.12'
 }

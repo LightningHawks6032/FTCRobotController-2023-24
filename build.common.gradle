@@ -55,7 +55,8 @@ android {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
         // FIXME: remove for robot if there is no OS update
-        minSdkVersion 28 // <-- THIS COULD BE A PROBLEM, INCOMPATIBLE W/ ACTUAL ROBOT?
+//        minSdkVersion 28 // <-- THIS COULD BE A PROBLEM, INCOMPATIBLE W/ ACTUAL ROBOT?
+        minSdkVersion 25
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
 
