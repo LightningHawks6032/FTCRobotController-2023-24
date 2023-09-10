@@ -167,15 +167,17 @@ open class LOpMode<T : Any>(
 
         suspend fun createLoop(
                 condition: () -> Boolean = { duringRun },
+                blockDestructor: () -> Unit = {},
                 block: LoopScope<T>.() -> Unit,
         ) {
-            internalCreateLoop(this, condition, block)
+            internalCreateLoop(this, condition, block, blockDestructor)
         }
 
         private suspend fun internalCreateLoop(
                 scope: CoroutineScope,
                 condition: () -> Boolean = { duringRun },
                 block: LoopScope<T>.() -> Unit,
+                blockDestructor: () -> Unit,
         ) {
             runningLoopCountLock.mutate { it + 1 }
             scope.launch {
@@ -193,6 +195,7 @@ open class LOpMode<T : Any>(
                         loopScope.updateAtEndOfLoop()
                     }
                 } finally {
+                    blockDestructor()
                     runningLoopCountLock.mutate { it - 1 }
                 }
             }
