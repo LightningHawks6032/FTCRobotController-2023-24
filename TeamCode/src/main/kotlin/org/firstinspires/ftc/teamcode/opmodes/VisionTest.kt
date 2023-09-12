@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.vision.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.createVisionLoop
 import org.firstinspires.ftc.vision.VisionPortal
+import kotlin.math.roundToInt
 
 val visionTestRobot = VisionTestRobot()
 
@@ -33,10 +34,16 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
             val detections = robot.aprilTag.freshDetections ?: CONTINUE
             // Report
             withTelemetry {
+                if (detections.isEmpty()) {
+                    ln("no detections")
+                }
                 for (detection in detections) {
-                    ln("tag #${detection.id} at ${detection.ftcPose.let { 
-                        "(${it.x}, ${it.y}, ${it.z}) (pitch ${it.pitch}, yaw ${it.yaw}, roll ${it.roll})"
-                    }} ")
+                    print(detection)
+                    ln("-- tag #${detection.id} ---------")
+                    ln("[${detection.corners?.joinToString("; ") { "${it.x.roundToInt()},${it.y.roundToInt()}" }}]")
+                    ln(detection.ftcPose?.let {
+                        "(${it.x}, ${it.y}, ${it.z})\n(${it.pitch}, ${it.yaw}, ${it.roll})"
+                    } ?: "unknown position")
                 }
             }
         } else {
@@ -51,7 +58,10 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
 
 class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val vision = Vision("Webcam 1")
-    val aprilTagSpec = VisAprilTag()
+    val aprilTagSpec = VisAprilTag(VisAprilTag.specifyTagInfo {
+        addTagsCenterStage()
+        +VisAprilTag.TagInfo(42,"test",5.0)
+    })
 
     inner class Impl(hardwareMap: IHardwareMap) {
         val vision = this@VisionTestRobot.vision.Impl(hardwareMap)
