@@ -60,3 +60,39 @@ data class Vec2Rot(
         val zero = Vec2Rot(Vec2.zero, 0.0)
     }
 }
+
+
+data class Vec3(
+        val x: Double,
+        val y: Double,
+        val z: Double,
+) {
+    operator fun plus(other: Vec3) = Vec3(this.x + other.x, this.y + other.y, this.z + other.z)
+    operator fun minus(other: Vec3) = this + -other
+    operator fun times(k: Double) = Vec3(x * k, y * k, z * k)
+    operator fun times(other: Vec3) = Vec3(this.x * other.x, this.y * other.y, this.z * other.z)
+    operator fun unaryMinus() = this * -1.0
+    operator fun div(other: Double) = this * (1.0 / other)
+
+    /** Take the dot product between `this` and `other`. */
+    infix fun dot(other: Vec3) = this.x * other.x + this.y * other.y + this.z * other.z
+
+    val magSq get() = this dot this
+    val mag get() = sqrt(magSq)
+
+    /**
+     * Return a [Vec3] rotated around the Z-axis.
+     *
+     * Angles are in Radians, positive is counter-clockwise viewed from above.
+     */
+    fun rotateZ(angle: Double) =
+            Vec3(
+                    x * cos(angle) - y * sin(angle),
+                    x * sin(angle) + y * cos(angle),
+                    z,
+            )
+
+    companion object {
+        val zero = Vec3(0.0, 0.0, 0.0)
+    }
+}

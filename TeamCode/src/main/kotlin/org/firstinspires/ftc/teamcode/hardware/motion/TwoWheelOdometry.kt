@@ -52,9 +52,10 @@ class TwoWheelOdometry(
     }
 
     override fun nudge(newPos: Vec2Rot) {
-        acc = acc.transformP { it.rotate(newPos.r - pos.r) }
-        vel = vel.transformP { it.rotate(newPos.r - pos.r) }
+        val deltaHeading = newPos.r - pos.r
         pos = newPos
+        vel = vel.transformP { it.rotate(deltaHeading) }
+        acc = acc.transformP { it.rotate(deltaHeading) }
     }
 
     private var currentImpl: Impl? = null
