@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -96,3 +97,5 @@ data class Vec3(
         val zero = Vec3(0.0, 0.0, 0.0)
     }
 }
+
+fun VectorF.intoVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())

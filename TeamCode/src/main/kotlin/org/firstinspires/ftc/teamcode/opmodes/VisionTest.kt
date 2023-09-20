@@ -4,11 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
+import org.firstinspires.ftc.teamcode.hardware.motion.AprilTagOdometry
+import org.firstinspires.ftc.teamcode.util.Vec3
 import org.firstinspires.ftc.teamcode.vision.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.createVisionLoop
 import org.firstinspires.ftc.vision.VisionPortal
-import kotlin.math.roundToInt
 
 val visionTestRobot = VisionTestRobot()
 
@@ -16,6 +17,9 @@ val visionTestRobot = VisionTestRobot()
 class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
     withTelemetry {
         ln("init began")
+    }
+    createLoop({ duringInit || duringRun }) {
+        robot.aprilTagOdometry.tick(dt)
     }
     createVisionLoop(
             robot.vision,
@@ -30,8 +34,10 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
         }
         if (duringRun) {
             robot.aprilTag.decimation = 1.0
+
             // Get new detections, if none, wait.
             val detections = robot.aprilTag.freshDetections ?: CONTINUE
+            robot.aprilTagOdometry.tickTrackedTags(0, detections)
             // Report
             withTelemetry {
                 if (detections.isEmpty()) {
@@ -40,10 +46,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
                 for (detection in detections) {
                     print(detection)
                     ln("-- tag #${detection.id} ---------")
-                    ln("[${detection.corners?.joinToString("; ") { "${it.x.roundToInt()},${it.y.roundToInt()}" }}]")
-                    ln(detection.ftcPose?.let {
-                        "(${it.x}, ${it.y}, ${it.z})\n(${it.pitch}, ${it.yaw}, ${it.roll})"
-                    } ?: "unknown position")
+
                 }
             }
         } else {
@@ -60,12 +63,15 @@ class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val vision = Vision("Webcam 1")
     val aprilTagSpec = VisAprilTag(VisAprilTag.specifyTagInfo {
         addTagsCenterStage()
-        +VisAprilTag.TagInfo(42,"test",5.0)
+        +VisAprilTag.TagInfo(42, "test", 5.0)
     })
 
     inner class Impl(hardwareMap: IHardwareMap) {
         val vision = this@VisionTestRobot.vision.Impl(hardwareMap)
         val aprilTag = aprilTagSpec.Instance()
+        val aprilTagOdometry = AprilTagOdometry(
+                AprilTagOdometry.CameraPlacement(Vec3(0.0, 0.0, 0.0), 0.0)
+        )
     }
 
     override fun impl(hardwareMap: IHardwareMap) = Impl(hardwareMap)
