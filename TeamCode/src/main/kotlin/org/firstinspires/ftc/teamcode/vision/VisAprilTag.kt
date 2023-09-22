@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor.PoseSolver
 
@@ -94,6 +95,9 @@ class VisAprilTag(
         fun addTag(id: Int, name: String, sizeInches: Double) {
             ftc.addTag(id, name, sizeInches, DistanceUnit.INCH)
         }
+        fun addTag(id: Int, name: String, sizeInches: Double, locationInches: VectorF, worldNegXToTagFwdRot: Quaternion) {
+            ftc.addTag(id, name, sizeInches, locationInches, DistanceUnit.INCH, worldNegXToTagFwdRot)
+        }
         fun addTag(tag: TagInfo) {
             ftc.addTag(tag.id, tag.name, tag.sizeInches, DistanceUnit.INCH)
         }
@@ -101,7 +105,37 @@ class VisAprilTag(
             ftc.addTags(lib)
         }
         fun addTagsCenterStage() {
-            addTags(AprilTagGameDatabase.getCenterStageTagLibrary())
+            // Need to create them manually because the official FTCRobotController repo typo'd it.
+            addTag(1, "BlueAllianceLeft",
+                            2.0, VectorF(60.25f, 41.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(2, "BlueAllianceCenter",
+                            2.0, VectorF(60.25f, 35.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(3, "BlueAllianceRight",
+                            2.0, VectorF(60.25f, 29.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(4, "RedAllianceLeft",
+                            2.0, VectorF(60.25f, -29.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(5, "RedAllianceCenter",
+                            2.0, VectorF(60.25f, -35.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(6, "RedAllianceRight",
+                            2.0, VectorF(60.25f, -41.41f, 4f),
+                            Quaternion(0.683f, -0.183f, 0.183f, 0.683f, 0))
+            addTag(7, "RedAudienceWallLarge",
+                            5.0, VectorF(-70.25f, -40.625f, 5.5f),
+                            Quaternion(0.7071f, 0f, 0f, -0.7071f, 0))
+            addTag(8, "RedAudienceWallSmall",
+                            2.0, VectorF(-70.25f, -35.125f, 4f),
+                            Quaternion(0.7071f, 0f, 0f, -0.7071f, 0))
+            addTag(9, "BlueAudienceWallSmall",
+                            2.0, VectorF(-70.25f, 35.125f, 4f),
+                            Quaternion(0.7071f, 0f, 0f, -0.7071f, 0))
+            addTag(10, "BlueAudienceWallLarge",
+                            5.0, VectorF(-70.25f, 40.625f, 5.5f),
+                            Quaternion(0.7071f, 0f, 0f, -0.7071f, 0))
         }
 
         operator fun TagInfo.unaryPlus() {

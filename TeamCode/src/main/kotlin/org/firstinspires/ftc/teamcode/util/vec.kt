@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.util
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -92,10 +93,17 @@ data class Vec3(
                     x * sin(angle) + y * cos(angle),
                     z,
             )
+    /**
+     * Return a [Vec3] that has been rotated by the given quaternion.
+     *
+     * I just call the FTC implementation of quaternion I don't know how it works.
+     */
+    fun rotateByQuaternion(q: Quaternion) =
+            q.applyToVector(VectorF(x.toFloat(),y.toFloat(),z.toFloat())).toVec3()
 
     companion object {
         val zero = Vec3(0.0, 0.0, 0.0)
     }
 }
 
-fun VectorF.intoVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())
+fun VectorF.toVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())

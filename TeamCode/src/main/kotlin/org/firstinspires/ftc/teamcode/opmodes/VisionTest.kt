@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.motion.AprilTagOdometry
 import org.firstinspires.ftc.teamcode.util.Vec3
+import org.firstinspires.ftc.teamcode.util.selectDebugBool
 import org.firstinspires.ftc.teamcode.vision.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.createVisionLoop
@@ -15,6 +18,7 @@ val visionTestRobot = VisionTestRobot()
 
 @TeleOp
 class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
+    selectDebugBool("invertTagRot")
     withTelemetry {
         ln("init began")
     }
@@ -63,7 +67,13 @@ class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val vision = Vision("Webcam 1")
     val aprilTagSpec = VisAprilTag(VisAprilTag.specifyTagInfo {
         addTagsCenterStage()
-        +VisAprilTag.TagInfo(42, "test", 5.0)
+        addTag(
+                42,
+                "test",
+                6.0,
+                VectorF(0f, 0f, 0f, 0f),
+                Quaternion(0f, 0f, 1f, 0f, 0),
+        )
     })
 
     inner class Impl(hardwareMap: IHardwareMap) {
