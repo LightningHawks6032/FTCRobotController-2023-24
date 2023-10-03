@@ -39,6 +39,20 @@ data class Vec2(
     }
 }
 
+/**
+ * Represents a location in the world.
+ *
+ * Position coordinate system:
+ * - (0,0) -> center of the field
+ * - +x -> towards red alliance human area
+ * - +y -> 90deg ccw of that
+ * - +z -> up
+ *
+ * Rotations:
+ * - 0 -> facing forward to +x
+ * - counter clockwise
+ *
+ */
 data class Vec2Rot(
         val v: Vec2,
         /** Rotation in radians, positive is counter-clockwise */
@@ -107,3 +121,4 @@ data class Vec3(
 }
 
 fun VectorF.toVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())
+fun Quaternion.apply(vec3: Vec3) = vec3.rotateByQuaternion(this)

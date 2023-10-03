@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.motion.AprilTagOdometry
 import org.firstinspires.ftc.teamcode.util.Vec3
-import org.firstinspires.ftc.teamcode.util.selectDebugBool
 import org.firstinspires.ftc.teamcode.vision.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.createVisionLoop
@@ -18,7 +17,7 @@ val visionTestRobot = VisionTestRobot()
 
 @TeleOp
 class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
-    selectDebugBool("invertTagRot")
+//    selectDebugBool("invertTagRot")
     withTelemetry {
         ln("init began")
     }
@@ -48,10 +47,12 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
                     ln("no detections")
                 }
                 for (detection in detections) {
-                    print(detection)
                     ln("-- tag #${detection.id} ---------")
 
                 }
+                ln("x: ${robot.aprilTagOdometry.pos.v.x}")
+                ln("y: ${robot.aprilTagOdometry.pos.v.y}")
+                ln("r: ${robot.aprilTagOdometry.pos.r}")
             }
         } else {
             robot.aprilTag.decimation = 10.0
@@ -68,12 +69,33 @@ class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val aprilTagSpec = VisAprilTag(VisAprilTag.specifyTagInfo {
         addTagsCenterStage()
         addTag(
-                42,
+                584,
                 "test",
-                6.0,
-                VectorF(0f, 0f, 0f, 0f),
-                Quaternion(0f, 0f, 1f, 0f, 0),
+                4.0,
+                VectorF(0f, 0f, 0f),
+                Quaternion(1f, 0f, 0f, 0f, 0),
         )
+//        addTag(
+//                584,
+//                "test",
+//                4.0,
+//                VectorF(10f, 10f, 10f),
+//                Quaternion(1f, 0f, 0f, 0f, 0),
+//        )
+        addTag(
+                583,
+                "test2",
+                4.0,
+                VectorF(0f, 0f, 0f),
+                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
+        )
+//        addTag(
+//                583,
+//                "test2",
+//                4.0,
+//                VectorF(10f, 10f, 0f),
+//                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
+//        )
     })
 
     inner class Impl(hardwareMap: IHardwareMap) {
