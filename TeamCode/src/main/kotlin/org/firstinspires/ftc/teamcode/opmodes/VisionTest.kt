@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
-import org.firstinspires.ftc.teamcode.hardware.motion.AprilTagOdometry
 import org.firstinspires.ftc.teamcode.util.Vec3
-import org.firstinspires.ftc.teamcode.vision.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.Vision
+import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagInfoBuilder
+import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagTracking
+import org.firstinspires.ftc.teamcode.vision.apriltag.VisAprilTag
 import org.firstinspires.ftc.teamcode.vision.createVisionLoop
 import org.firstinspires.ftc.vision.VisionPortal
 
@@ -26,7 +26,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
     }
     createVisionLoop(
             robot.vision,
-            listOf(robot.aprilTag),
+            listOf(robot.visAprilTag),
             condition = { duringInit || duringRun },
     ) { vision ->
         if (vision.cameraState != VisionPortal.CameraState.STREAMING) {
@@ -36,11 +36,11 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
             CONTINUE
         }
         if (duringRun) {
-            robot.aprilTag.decimation = 1.0
+            robot.visAprilTag.decimation = 1.0
 
             // Get new detections, if none, wait.
-            val detections = robot.aprilTag.freshDetections ?: CONTINUE
-            robot.aprilTagOdometry.tickTrackedTags(0, detections)
+            val detections = robot.visAprilTag.freshDetections ?: CONTINUE
+            robot.aprilTagTracking.updateEstimates(0, detections)
             // Report
             withTelemetry {
                 if (detections.isEmpty()) {
@@ -55,7 +55,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
                 ln("r: ${robot.aprilTagOdometry.pos.r}")
             }
         } else {
-            robot.aprilTag.decimation = 10.0
+            robot.visAprilTag.decimation = 10.0
             withTelemetry {
                 ln("camera online")
             }
@@ -66,44 +66,49 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
 
 class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val vision = Vision("Webcam 1")
-    val aprilTagSpec = VisAprilTag(VisAprilTag.specifyTagInfo {
+    val aprilTagInfo = AprilTagInfoBuilder {
         addTagsCenterStage()
-        addTag(
+        addForRobotPos(
                 584,
                 "test",
                 4.0,
-                VectorF(0f, 0f, 0f),
+                Vec3(0.0, 0.0, 0.0),
                 Quaternion(1f, 0f, 0f, 0f, 0),
         )
-//        addTag(
+//        addForRobotPos(
 //                584,
 //                "test",
 //                4.0,
-//                VectorF(10f, 10f, 10f),
+//                Vec3(10.0, 10.0, 10.0),
 //                Quaternion(1f, 0f, 0f, 0f, 0),
 //        )
-        addTag(
+        addForRobotPos(
                 583,
                 "test2",
                 4.0,
-                VectorF(0f, 0f, 0f),
+                Vec3(0.0, 0.0, 0.0),
                 Quaternion(0.707f, 0f, 0f, 0.707f, 0),
         )
-//        addTag(
+//        addForRobotPos(
 //                583,
 //                "test2",
 //                4.0,
-//                VectorF(10f, 10f, 0f),
+//                Vec3(10.0, 10.0, 0.0),
 //                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
 //        )
-    })
+    }
+    val visAprilTag = VisAprilTag(aprilTagInfo)
+    val aprilTagTracking = AprilTagTracking(
+            aprilTagInfo,
+            AprilTagTracking.CameraPlacement(Vec3(0.0, 0.0, 0.0), 0.0)
+    )
+    val aprilTagOdometry = aprilTagTracking.Odometry()
 
     inner class Impl(hardwareMap: IHardwareMap) {
         val vision = this@VisionTestRobot.vision.Impl(hardwareMap)
-        val aprilTag = aprilTagSpec.Instance()
-        val aprilTagOdometry = AprilTagOdometry(
-                AprilTagOdometry.CameraPlacement(Vec3(0.0, 0.0, 0.0), 0.0)
-        )
+        val visAprilTag = this@VisionTestRobot.visAprilTag.Instance()
+        val aprilTagTracking = this@VisionTestRobot.aprilTagTracking
+        val aprilTagOdometry = this@VisionTestRobot.aprilTagOdometry
     }
 
     override fun impl(hardwareMap: IHardwareMap) = Impl(hardwareMap)

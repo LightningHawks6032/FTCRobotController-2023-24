@@ -121,4 +121,5 @@ data class Vec3(
 }
 
 fun VectorF.toVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())
+fun Vec3.toVectorF() = VectorF(this.x.toFloat(), this.y.toFloat(), this.z.toFloat())
 fun Quaternion.apply(vec3: Vec3) = vec3.rotateByQuaternion(this)
