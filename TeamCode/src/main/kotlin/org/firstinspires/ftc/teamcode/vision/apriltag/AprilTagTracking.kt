@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.util.*
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
 import kotlin.math.absoluteValue
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 class AprilTagTracking(
         tagInfo: AprilTagInfoBuilder,
@@ -62,12 +64,19 @@ class AprilTagTracking(
     }
 
 
-    fun updateEstimates(camNum: Int, detections: List<AprilTagDetection>) = cameras[camNum].updateEstimates(detections)
+    fun updateEstimates(
+            camNum: Int,
+            detections: List<AprilTagDetection>,
+            acceptedRobotPos: Vec2Rot,
+    ) = cameras[camNum].updateEstimates(
+            detections,
+            acceptedRobotPos,
+    )
 
 
     class CameraPlacement(
             val robotSpacePos: Vec3,
-            val camZRotOffY: Double,
+            val camZRotOffX: Double,
     )
 
     inner class TrackingCamera(
@@ -80,7 +89,7 @@ class AprilTagTracking(
 
         val hasPosition = botPosEstimates.isNotEmpty()
 
-        private fun predictCamLocationRelTag(detection: AprilTagDetection): CamLocationEstimate {
+        private fun predictTFCamToTag(detection: AprilTagDetection): Transform3D {
             // Transform from (tag to camera) perspective
             val posePos = detection.rawPose.let { p -> Vec3(p.x, p.y, p.z) }
             val poseRot = Quaternion.fromMatrix(detection.rawPose.R, 0).inverse()
@@ -93,94 +102,93 @@ class AprilTagTracking(
 
             val rotated = poseRot.apply(posePos)
             val camPosTagSpace = rotated.let { Vec3(-it.z, it.x, -it.y) } * 0.85
-            val camHdgTagSpace = poseRot.apply(Vec3(1.0, 0.0, 0.0)).let {
-                atan2(it.z, it.x)
-            }
-            return CamLocationEstimate(camPosTagSpace, camHdgTagSpace)
+
+            val camRotTagSpace = poseRot.let { Quaternion(it.w, it.z, -it.x, it.y, 0) }
+            return Transform3D(camPosTagSpace, camRotTagSpace)
         }
 
         /** dark magic that approximates positions from AprilTag poses and location metadata */
-        fun updateEstimates(detections: List<AprilTagDetection>) {
-            botPosEstimates = detections.filter { tagUsages[it.id] == AprilTagUsage.RobotPosition }.map { detection ->
-                // this code is dense with math I suggest you sit down for this one
+        fun updateEstimates(detections: List<AprilTagDetection>, acceptedRobotPos: Vec2Rot) {
+            // Predict the positions we care about by representing each relative position we know
+            // (tag relative to camera, camera relative to robot, etc.), and represent them as
+            // transformations to turn a position relative to one into a position relative
+            // to the other.
+            //
+            // This representation is helpful, as it allows us to chain changes of perspective
+            // without much sweat (see Transform3D for details).
+            //
+            // TODO: units (inches or mm idk lol, probably inches tho)
+            //
 
-                // TODO: units (inches or mm idk lol)
+            val camPosRobotSpace = placement.robotSpacePos
+            val camRotRobotSpace = Quaternion(
+                    // z-rotation in quaternion
+                    cos(placement.camZRotOffX).toFloat(),
+                    0.0f,
+                    0.0f,
+                    sin(placement.camZRotOffX).toFloat(),
+                    0,
+            )
+            val cam2robot = Transform3D(camPosRobotSpace, camRotRobotSpace)
 
+            val robot2worldPrev = Transform3D(
+                    acceptedRobotPos.v.let { Vec3(it.x,it.y,0.0) },
+                    Quaternion(
+                            // z-rotation in quaternion
+                            cos(acceptedRobotPos.r).toFloat(),
+                            0.0f,
+                            0.0f,
+                            sin(acceptedRobotPos.r).toFloat(),
+                            0,
+                    )
+            )
+
+            val allEstimates = detections.mapNotNull { detection ->
                 if (detection.rawPose == null || detection.metadata == null) {
-                    return@map null
+                    return@mapNotNull null
                 }
 
-                // game plan
-                // we know
-                // - camera position relative to robot
-                // - tag position relative to camera
-                // keep transforming until we have robot relative to world space.
-                // use math only so we don't make any silly mistakes with visualization
-                // get transform from (robot to world), this is our robot position info.
+                val cam2tag = predictTFCamToTag(detection)
 
-                // Note 0: quaternions rotate things that's all you need to know
+                when (tagUsages[detection.id]) {
+                    null -> null
+                    AprilTagUsage.RobotPosition -> {
+                        val tagPosWorldSpace = detection.metadata.fieldPosition.toVec3()
+                        val tagRotWorldSpace = detection.metadata.fieldOrientation
+                        val tag2world = Transform3D(tagPosWorldSpace, tagRotWorldSpace)
 
-                //////// Note 1: How to perspective transformations //
-                // let v: vec
-                ///// (rotation: a to world)
-                // let r: quaternion
-                ///// (translation: a to world)
-                // let t: vec
-                ///// (a to world).applyTo(v)
-                // let v_world = r.applyTo(v) + t
-                ///// inverse(a to world).applyTo(v)
-                // let v_a = r.inverse().applyTo(v_world - t)
-                //////////////////////////////////////////////////////
+                        // transformation chain: robot to cam to tag to world
+                        val robot2world = cam2robot.inverse() then cam2tag then tag2world
 
-                //////// Note 2: How to quaternions //////////////////
-                // let a: quaternion
-                // let b: quaternion
-                ///// Notice! the order of multiplication is backwards!
-                // let a_then_b = b*a
-                //////////////////////////////////////////////////////
+                        // We did it! Now we need to convert back to Vec2Rot, because the robot
+                        // does not know what a "3d" is.
 
-                // get (cam to tag)
-                val camLoc = predictCamLocationRelTag(detection)
+                        // Extract coordinates from the resulting Transform3D and combine
+                        val robotPosXY = robot2world.offset.let { Vec2(it.x, it.y) }
+                        val robotPosZ = robot2world.offset.z
+                        val (robotHdg, robotHdgZErr) = Vec3(1.0, 0.0, 0.0).rotateByQuaternion(robot2world.rotation).let {
+                            Pair(atan2(it.y, it.x), it.z)
+                        }
+                        val robotPos = Vec2Rot(robotPosXY, robotHdg)
 
-                // Transform from (tag to world) perspective
-                val tagPosWorldSpace = detection.metadata.fieldPosition.toVec3()
-                val tagRotWorldSpace = detection.metadata.fieldOrientation
-                val tagHdgWorldSpace = Vec3(1.0, 0.0, 0.0).rotateByQuaternion(tagRotWorldSpace).let { atan2(it.y, it.x) }
+                        // Crude confidence approximation, based on if the robot thinks it's
+                        // either floating or embedded in the ground.
+                        val confidence = 1.0 / (robotPosZ.absoluteValue * 0.2 + robotHdgZErr.absoluteValue * 0.2 + 0.5)
 
-                // have (tag to world)
-                //   = (rotate: tag to world).applyTo(it) + (translate: tag to world)
-                // now apply it to the previous result
-                val camPosWorldSpace = tagRotWorldSpace.apply(camLoc.camPosTagSpace) + tagPosWorldSpace
-                // (world to tag) then (tag to cam)
-                val camHdgWorldSpace = camLoc.camHdgTagSpace + tagHdgWorldSpace
+                        BotPositionEstimate(confidence, robotPos)
+                    }
+                    AprilTagUsage.TagPosition -> {
+                        // transformation chain: tag to camera to robot to world
+                        val tag2world = cam2tag.inverse() then cam2robot then robot2worldPrev
 
-                // inverse(robot to cam) = (cam to robot)
-                //   = (rotate: robot to cam).inverse().applyTo(it - (translate: robot to cam))
-                // go from the zero position, now the center of the robot
-                // this will give the robot's position relative to the camera
-                val robotPosCameraSpace = (/*zero*/-placement.robotSpacePos)
-                        .rotateZ(-placement.camZRotOffY)
-                // (world to robot) = (world to cam) then (cam to robot)
-                val robotPosWorldSpace = robotPosCameraSpace
-                        .rotateZ(camHdgWorldSpace - placement.camZRotOffY) +
-                        camPosWorldSpace
-                val robotHdgWorldSpace = camHdgWorldSpace - placement.camZRotOffY
+                        // This is easy because we want to report these positions in 3d space anyway.
+                        TagPositionEstimate(tag2world.offset, tag2world.rotation)
+                    }
+                }
+            }
 
-                // We did it! Now we need to convert back to Vec2Rot, because the robot
-                // does not know what a "3d" is.
-
-                // Extract x and y coordinates, ignoring z (no floating robots, please)
-                val robotXYPos = robotPosWorldSpace.let { v -> Vec2(v.x, v.y) }
-
-                // Combine
-                val robotPos = Vec2Rot(robotXYPos, robotHdgWorldSpace)
-
-                // Crude confidence approximation, based on if the robot thinks it's
-                // either floating or embedded in the ground.
-                val confidence = 1.0 / (robotPosWorldSpace.z.absoluteValue * 0.2 + 0.5)
-
-                BotPositionEstimate(confidence, robotPos)
-            }.filterNotNull()
+            botPosEstimates = allEstimates.filterIsInstance<BotPositionEstimate>()
+            tagPosEstimates = allEstimates.filterIsInstance<TagPositionEstimate>()
 
             markHasUpdatedSomeCamera()
         }
@@ -192,14 +200,7 @@ class AprilTagTracking(
     )
 
     class TagPositionEstimate(
-            val worldPos: Vec3,
-            val worldRot: Quaternion,
-    )
-
-    /** Represents the predicted location of a camera relative
-     * to an AprilTag in inches. */
-    private class CamLocationEstimate(
-            val camPosTagSpace: Vec3,
-            val camHdgTagSpace: Double,
+            val pos: Vec3,
+            val rot: Quaternion,
     )
 }

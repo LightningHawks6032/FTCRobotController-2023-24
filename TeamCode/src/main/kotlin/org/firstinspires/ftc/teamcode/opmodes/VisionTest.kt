@@ -40,7 +40,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
 
             // Get new detections, if none, wait.
             val detections = robot.visAprilTag.freshDetections ?: CONTINUE
-            robot.aprilTagTracking.updateEstimates(0, detections)
+            robot.aprilTagTracking.updateEstimates(0, detections, robot.aprilTagOdometry.pos)
             // Report
             withTelemetry {
                 if (detections.isEmpty()) {
@@ -66,7 +66,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
 
 class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
     val vision = Vision("Webcam 1")
-    val aprilTagInfo = AprilTagInfoBuilder {
+    private val aprilTagInfo = AprilTagInfoBuilder {
         addTagsCenterStage()
         addForRobotPos(
                 584,
