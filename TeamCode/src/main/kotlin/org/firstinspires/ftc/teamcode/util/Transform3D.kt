@@ -30,11 +30,11 @@ data class Transform3D(
     fun transformFwd(vec: Vec3) =  // q v q' + t
             rotation.apply(vec) + offset
     fun transformFwd(rot: Quaternion): Quaternion = // q r
-            rotation.multiply(rot, 0)
+            rotation * rot
     fun transformInv(vec: Vec3) = // q' (v - t) q
             rotation.inverse().apply(vec - offset)
     fun transformInv(rot: Quaternion): Quaternion = // q' r
-            rotation.inverse().multiply(rot, 0)
+            rotation.inverse() * rot
 
     fun inverse() = // T = q' -t q ; Q = q'
             Transform3D(rotation.inverse().apply(-offset), rotation.inverse())
@@ -53,7 +53,7 @@ data class Transform3D(
     infix fun then(next: Transform3D) =
             Transform3D(
                     next.rotation.apply(offset) + next.offset, // t2 = q1 t0 q1' + t1
-                    next.rotation.multiply(rotation, 0), // q2 = q1 q0
+                    next.rotation * rotation, // q2 = q1 q0
             )
 }
 

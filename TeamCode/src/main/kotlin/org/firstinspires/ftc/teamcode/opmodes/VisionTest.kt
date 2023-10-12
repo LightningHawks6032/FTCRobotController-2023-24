@@ -53,6 +53,10 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
                 ln("x: ${robot.aprilTagOdometry.pos.v.x}")
                 ln("y: ${robot.aprilTagOdometry.pos.v.y}")
                 ln("r: ${robot.aprilTagOdometry.pos.r}")
+                ln("-------------------")
+            }
+            for (tagLoc in robot.aprilTagTracking.tagPositionEstimates.values) {
+                println("${tagLoc.id} :: ${tagLoc.pos}")
             }
         } else {
             robot.visAprilTag.decimation = 10.0
@@ -96,6 +100,7 @@ class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
 //                Vec3(10.0, 10.0, 0.0),
 //                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
 //        )
+        addForTagPos(585, "loc", 6.0)
     }
     val visAprilTag = VisAprilTag(aprilTagInfo)
     val aprilTagTracking = AprilTagTracking(

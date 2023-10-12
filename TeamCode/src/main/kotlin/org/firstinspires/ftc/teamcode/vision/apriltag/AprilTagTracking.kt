@@ -29,7 +29,7 @@ class AprilTagTracking(
 
         override fun tick(dt: Double) {
             dtAccumulated += dt
-            if (odoUpdatedN != updatedAnyCameraN) return
+            if (odoUpdatedN == updatedAnyCameraN) return
             odoUpdatedN = updatedAnyCameraN
 
 
@@ -63,6 +63,20 @@ class AprilTagTracking(
         }
     }
 
+    val tagPositionEstimates: Map<Int, TagPositionEstimate>
+        get() {
+            val positions = mutableMapOf<Int, MutableList<TagPositionEstimate>>()
+            for (cam in cameras) {
+                for (tagPosEstimate in cam.tagPosEstimates) {
+                    positions[tagPosEstimate.id] = (
+                            positions[tagPosEstimate.id] ?: mutableListOf()
+                            ).also {
+                                it.add(tagPosEstimate)
+                            }
+                }
+            }
+            return positions.mapValues { TagPositionEstimate.average(it.key, it.value) }
+        }
 
     fun updateEstimates(
             camNum: Int,
@@ -93,17 +107,21 @@ class AprilTagTracking(
             // Transform from (tag to camera) perspective
             val posePos = detection.rawPose.let { p -> Vec3(p.x, p.y, p.z) }
             val poseRot = Quaternion.fromMatrix(detection.rawPose.R, 0).inverse()
-//            println("\n" + ("""
-//                        ### CSV Regression thing Row ###
-//                        pose_pos_x, pose_pos_y, pose_pos_z, pose_r_w, pose_r_x, pose_r_y, pose_r_z, gt_x, gt_y, gt_z, gt_r
-//                        ${posePos.let { "${it.x}, ${it.y}, ${it.z}" }}, ${poseRot.let { "${it.w}, ${it.x}, ${it.y}, ${it.z}" }}, ####, ####, ####, ####
-//                        ##################################
-//                    """.trimIndent()))
 
             val rotated = poseRot.apply(posePos)
-            val camPosTagSpace = rotated.let { Vec3(-it.z, it.x, -it.y) } * 0.85
+            val camPosTagSpace = rotated.let { Vec3(-it.z, it.x, it.y) } * 0.85 // z axis could be negative ¯\_(ツ)_/¯
 
-            val camRotTagSpace = poseRot.let { Quaternion(it.w, it.z, -it.x, it.y, 0) }
+            val camRotTagSpace = poseRot.let { Quaternion(it.w, it.z, -it.x, -it.y, 0) }
+            return Transform3D(camPosTagSpace, camRotTagSpace)
+        }
+        private fun predictTFTagToCam(detection: AprilTagDetection): Transform3D {
+            // Transform from (tag to camera) perspective
+            val posePos = detection.rawPose.let { p -> Vec3(p.x, p.y, p.z) }
+            val poseRot = Quaternion.fromMatrix(detection.rawPose.R, 0)
+
+            val camPosTagSpace = posePos.let { Vec3(it.z, -it.x, -it.y) } * 0.85
+
+            val camRotTagSpace = poseRot.inverse().let { Quaternion(it.w, it.z, -it.x, -it.y, 0) }
             return Transform3D(camPosTagSpace, camRotTagSpace)
         }
 
@@ -132,7 +150,7 @@ class AprilTagTracking(
             val cam2robot = Transform3D(camPosRobotSpace, camRotRobotSpace)
 
             val robot2worldPrev = Transform3D(
-                    acceptedRobotPos.v.let { Vec3(it.x,it.y,0.0) },
+                    acceptedRobotPos.v.let { Vec3(it.x, it.y, 0.0) },
                     Quaternion(
                             // z-rotation in quaternion
                             cos(acceptedRobotPos.r).toFloat(),
@@ -148,8 +166,6 @@ class AprilTagTracking(
                     return@mapNotNull null
                 }
 
-                val cam2tag = predictTFCamToTag(detection)
-
                 when (tagUsages[detection.id]) {
                     null -> null
                     AprilTagUsage.RobotPosition -> {
@@ -158,6 +174,7 @@ class AprilTagTracking(
                         val tag2world = Transform3D(tagPosWorldSpace, tagRotWorldSpace)
 
                         // transformation chain: robot to cam to tag to world
+                        val cam2tag = predictTFCamToTag(detection)
                         val robot2world = cam2robot.inverse() then cam2tag then tag2world
 
                         // We did it! Now we need to convert back to Vec2Rot, because the robot
@@ -179,10 +196,11 @@ class AprilTagTracking(
                     }
                     AprilTagUsage.TagPosition -> {
                         // transformation chain: tag to camera to robot to world
-                        val tag2world = cam2tag.inverse() then cam2robot then robot2worldPrev
+                        val tag2Cam = predictTFTagToCam(detection)
+                        val tag2world = tag2Cam then cam2robot then robot2worldPrev
 
                         // This is easy because we want to report these positions in 3d space anyway.
-                        TagPositionEstimate(tag2world.offset, tag2world.rotation)
+                        TagPositionEstimate(detection.id, tag2world.offset, tag2world.rotation)
                     }
                 }
             }
@@ -200,7 +218,17 @@ class AprilTagTracking(
     )
 
     class TagPositionEstimate(
+            val id: Int,
             val pos: Vec3,
             val rot: Quaternion,
-    )
+    ) {
+        companion object {
+            fun average(id: Int, estimates: List<TagPositionEstimate>): TagPositionEstimate {
+                val n = estimates.size
+                val rot = estimates.map { it.rot * (if (it.rot.w < 0) -1f else 1f) }.reduce { a, b -> a + b }.normalized()
+                val pos = estimates.map { it.pos }.reduce { a, b -> a + b } * (1.0 / n)
+                return TagPositionEstimate(id, pos, rot)
+            }
+        }
+    }
 }

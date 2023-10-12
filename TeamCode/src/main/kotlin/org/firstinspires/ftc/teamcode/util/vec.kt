@@ -107,13 +107,14 @@ data class Vec3(
                     x * sin(angle) + y * cos(angle),
                     z,
             )
+
     /**
      * Return a [Vec3] that has been rotated by the given quaternion.
      *
      * I just call the FTC implementation of quaternion I don't know how it works.
      */
     fun rotateByQuaternion(q: Quaternion) =
-            q.applyToVector(VectorF(x.toFloat(),y.toFloat(),z.toFloat())).toVec3()
+            q.applyToVector(VectorF(x.toFloat(), y.toFloat(), z.toFloat())).toVec3()
 
     companion object {
         val zero = Vec3(0.0, 0.0, 0.0)
@@ -123,3 +124,7 @@ data class Vec3(
 fun VectorF.toVec3() = Vec3(this[0].toDouble(), this[1].toDouble(), this[2].toDouble())
 fun Vec3.toVectorF() = VectorF(this.x.toFloat(), this.y.toFloat(), this.z.toFloat())
 fun Quaternion.apply(vec3: Vec3) = vec3.rotateByQuaternion(this)
+
+operator fun Quaternion.times(other: Float) = Quaternion(w * other, x * other, y * other, z * other, acquisitionTime)
+operator fun Quaternion.times(other: Quaternion): Quaternion = multiply(other, acquisitionTime)
+operator fun Quaternion.plus(other: Quaternion): Quaternion = Quaternion(this.w + other.w, this.x + other.x, this.y + other.y, this.z + other.z, acquisitionTime)
