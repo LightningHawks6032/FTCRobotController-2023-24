@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.util
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 
 data class Transform3D(
-        val offset: Vec3,
-        val rotation: Quaternion,
+        private val offset: Vec3,
+        private val rotation: Quaternion,
 ) {
     // Note 0: quaternions rotate things that's all you need to know
 
@@ -50,12 +50,62 @@ data class Transform3D(
     // > t2 = q1 t0 q1' + t1
     //    = (q2 v q2' + t2,  q2 r)
 
+    /**
+     * Compose two transformations in sequence, same as applying one and then the other.
+     */
     infix fun then(next: Transform3D) =
             Transform3D(
                     next.rotation.apply(offset) + next.offset, // t2 = q1 t0 q1' + t1
                     next.rotation * rotation, // q2 = q1 q0
             )
+
+    companion object {
+        /**
+         * Get a transform that takes positions in local space (offset from the outer space by
+         * the specified location) and converts them to the outer space.
+         */
+        fun local2outerFromLocation(position: Vec3, rotation: Quaternion) =
+                Transform3D(position, rotation)
+    }
+    /**
+     * Get the location of the center of this space relative to the outer space.
+     */
+    fun local2outerToLocation() = Pair(offset, rotation)
 }
 
 fun Vec3.tf(transform3D: Transform3D) = transform3D.transformFwd(this)
 fun Quaternion.tf(transform3D: Transform3D) = transform3D.transformFwd(this)
+
+
+/** A ground transform which has [center] (in global space) at it's local origin. */
+class Transform2D(private val center: Vec2Rot) {
+
+    /** Apply this transform in reverse. */
+    fun transformInv(worldPos: Vec2Rot) =
+            (worldPos - center).transformP { it.rotate(-center.r) }
+
+    /** Apply this transform. */
+    fun transformFwd(localPos: Vec2Rot) =
+            localPos.transformP { it.rotate(center.r) } + center
+
+    /** Apply this transform in reverse (but treat it as a velocity-like vector). */
+    fun transformVelInv(worldVel: Vec2Rot) =
+            worldVel.transformP { it.rotate(-center.r) }
+
+    /** Apply this transform (but treat it as a velocity-like vector). */
+    fun transformVelFwd(localVel: Vec2Rot) =
+            localVel.transformP { it.rotate(center.r) }
+
+
+    companion object {
+        /**
+         * Get a transform that takes positions in local space (offset from the outer space by
+         * the specified location) and converts them to the outer space.
+         */
+        fun local2outerFromLocation(pos: Vec2Rot) = Transform2D(pos)
+    }
+    /**
+     * Get the location of the center of this space relative to the outer space.
+     */
+    fun local2outerToLocation() = center
+}

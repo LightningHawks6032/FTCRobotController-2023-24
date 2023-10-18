@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.hardware.motion
 
-import org.firstinspires.ftc.teamcode.util.LocTransform
+import org.firstinspires.ftc.teamcode.util.Transform2D
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 /**
@@ -39,5 +39,5 @@ abstract class IOdometry {
     }
 
     /** Utility for converting between robot and global space, based on the current */
-    fun robotLocTransform() = LocTransform.Ground.Transform(pos)
+    fun robot2worldTransform() = Transform2D.local2outerFromLocation(pos)
 }

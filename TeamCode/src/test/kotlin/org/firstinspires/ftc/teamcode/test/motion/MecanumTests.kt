@@ -16,10 +16,10 @@ class MecanumTests {
 
         // get mecanum reference
         val mecanum = MecanumDrive(
+                Vec2Rot.zero,
                 spec,
                 MecanumDrive.ReversalPattern(),
                 ids,
-                Vec2Rot.zero,
         ).Impl(hardware)
 
         // get motor references
@@ -157,10 +157,10 @@ class MecanumTests {
 
         // get mecanum reference
         val mecanum = MecanumDrive(
+                Vec2Rot.zero,
                 spec,
                 reversePattern,
                 ids,
-                Vec2Rot.zero,
         ).Impl(hardware)
 
         // get motor references

@@ -98,12 +98,12 @@ class TestAuto : LOpMode<RobotA.Impl>(RobotA.instance, {
 
 class RobotA : IRobot<RobotA.Impl> {
     val drive = MecanumDrive(
+            Vec2Rot.zero,
             Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
             MecanumDrive.ReversalPattern(
                     right = true
             ),
             MecanumDrive.Ids.default,
-            Vec2Rot.zero,
     )
     val dbgOdo = AssumptionOdometry()
 //    val odo = TwoWheelOdometry(

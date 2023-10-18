@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware.motion
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.util.DeltaValue
-import org.firstinspires.ftc.teamcode.util.LocTransform
+import org.firstinspires.ftc.teamcode.util.Transform2D
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 /*
@@ -39,7 +39,7 @@ class ThreeWheelOdometry(
     val x0Reader = Motor(ids.x0, spec, Motor.Config { useEncoder = true; reversed = reversalPattern.x0 })
     val x1Reader = Motor(ids.x1, spec, Motor.Config { useEncoder = true; reversed = reversalPattern.x1 })
 
-    val subassemblyTransform = LocTransform.Ground.Transform(locationOnRobot)
+    val assembly2robotTransform = Transform2D.local2outerFromLocation(locationOnRobot)
 
     data class ReversalPattern(
             val y: Boolean = false,
@@ -56,11 +56,11 @@ class ThreeWheelOdometry(
 
     override fun tick(dt: Double) {
         val delta = currentImpl?.readDelta(dt)
-        val transform = robotLocTransform()
+        val robot2world = robot2worldTransform()
 
         val prevVel = vel
-        vel = transform.localToGlobalVel(delta?.vel ?: Vec2Rot.zero)
-        pos += transform.localToGlobalVel(delta?.dPos ?: Vec2Rot.zero)
+        vel = robot2world.transformVelFwd(delta?.vel ?: Vec2Rot.zero)
+        pos += robot2world.transformVelFwd(delta?.dPos ?: Vec2Rot.zero)
         acc = (vel - prevVel) / dt
     }
 
@@ -92,6 +92,7 @@ class ThreeWheelOdometry(
             currentImpl = this
         }
 
+        /** Get the estimated change in position in robot local space. */
         fun readDelta(dt: Double): Delta {
             val deltaX0 = deltaX0
             val deltaX1 = deltaX1
@@ -114,7 +115,7 @@ class ThreeWheelOdometry(
             val deltaR = (deltaX0 - deltaX1) / (x1ReaderPos - x0ReaderPos)
             val deltaX = (deltaX0 * x1ReaderPos - deltaX1 * x0ReaderPos) / (x1ReaderPos - x0ReaderPos)
             val deltaY = deltaYR - yReaderPos * deltaR
-            val deltaPos = subassemblyTransform.localToGlobalVel(
+            val deltaPos = assembly2robotTransform.transformVelFwd(
                     Vec2Rot(deltaX, deltaY, deltaR)
             )
             return Delta(deltaPos, dt)

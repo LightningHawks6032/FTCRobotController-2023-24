@@ -39,7 +39,7 @@ class DriveController(
                 target.pos, target.vel,
                 dt
         )
-        output.power = input.robotLocTransform().globalToLocalVel(
+        output.power = input.robot2worldTransform().transformVelInv(
                 pow * (MAX_POW / max(MAX_POW, max(pow.v.mag, abs(pow.r))))
         )
     }

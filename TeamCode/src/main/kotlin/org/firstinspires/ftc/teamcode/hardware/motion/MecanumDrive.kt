@@ -2,21 +2,21 @@ package org.firstinspires.ftc.teamcode.hardware.motion
 
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
-import org.firstinspires.ftc.teamcode.util.LocTransform
+import org.firstinspires.ftc.teamcode.util.Transform2D
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 class MecanumDrive(
+        assemblyLocationRobotSpace: Vec2Rot,
         motorSpec: Motor.PhysicalSpec,
         reversalPattern: ReversalPattern,
         ids: Ids,
-        locationOnRobot: Vec2Rot,
 ) {
     val frRef = Motor(ids.fr, motorSpec, Motor.Config { reversed = reversalPattern.fr })
     val flRef = Motor(ids.fl, motorSpec, Motor.Config { reversed = reversalPattern.fl })
     val brRef = Motor(ids.br, motorSpec, Motor.Config { reversed = reversalPattern.br })
     val blRef = Motor(ids.bl, motorSpec, Motor.Config { reversed = reversalPattern.bl })
 
-    val transform = LocTransform.Ground.Transform(locationOnRobot)
+    val assembly2robotTransform = Transform2D.local2outerFromLocation(assemblyLocationRobotSpace)
 
     data class ReversalPattern(
             val all: Boolean = false,
@@ -50,7 +50,7 @@ class MecanumDrive(
         override var power: Vec2Rot = Vec2Rot.zero
             set(newPower) {
                 field = newPower
-                val localSpacePower = transform.globalToLocalVel(newPower)
+                val localSpacePower = assembly2robotTransform.transformVelInv(newPower)
                 val (_,r) = localSpacePower
                 val (x,y) = localSpacePower.v
 

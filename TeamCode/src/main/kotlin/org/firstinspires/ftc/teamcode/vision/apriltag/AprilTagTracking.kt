@@ -112,17 +112,17 @@ class AprilTagTracking(
             val camPosTagSpace = rotated.let { Vec3(-it.z, it.x, it.y) } * 0.85 // z axis could be negative ¯\_(ツ)_/¯
 
             val camRotTagSpace = poseRot.let { Quaternion(it.w, it.z, -it.x, -it.y, 0) }
-            return Transform3D(camPosTagSpace, camRotTagSpace)
+            return Transform3D.local2outerFromLocation(camPosTagSpace, camRotTagSpace)
         }
         private fun predictTFTagToCam(detection: AprilTagDetection): Transform3D {
             // Transform from (tag to camera) perspective
             val posePos = detection.rawPose.let { p -> Vec3(p.x, p.y, p.z) }
             val poseRot = Quaternion.fromMatrix(detection.rawPose.R, 0)
 
-            val camPosTagSpace = posePos.let { Vec3(it.z, -it.x, -it.y) } * 0.85
+            val tagPosCamSpace = posePos.let { Vec3(it.z, -it.x, -it.y) } * 0.85
 
-            val camRotTagSpace = poseRot.inverse().let { Quaternion(it.w, it.z, -it.x, -it.y, 0) }
-            return Transform3D(camPosTagSpace, camRotTagSpace)
+            val tagRotCamSpace = poseRot.inverse().let { Quaternion(it.w, it.z, -it.x, -it.y, 0) }
+            return Transform3D.local2outerFromLocation(tagPosCamSpace, tagRotCamSpace)
         }
 
         /** dark magic that approximates positions from AprilTag poses and location metadata */
@@ -147,9 +147,9 @@ class AprilTagTracking(
                     sin(placement.camZRotOffX).toFloat(),
                     0,
             )
-            val cam2robot = Transform3D(camPosRobotSpace, camRotRobotSpace)
+            val cam2robot = Transform3D.local2outerFromLocation(camPosRobotSpace, camRotRobotSpace)
 
-            val robot2worldPrev = Transform3D(
+            val robot2worldPrev = Transform3D.local2outerFromLocation(
                     acceptedRobotPos.v.let { Vec3(it.x, it.y, 0.0) },
                     Quaternion(
                             // z-rotation in quaternion
@@ -171,7 +171,7 @@ class AprilTagTracking(
                     AprilTagUsage.RobotPosition -> {
                         val tagPosWorldSpace = detection.metadata.fieldPosition.toVec3()
                         val tagRotWorldSpace = detection.metadata.fieldOrientation
-                        val tag2world = Transform3D(tagPosWorldSpace, tagRotWorldSpace)
+                        val tag2world = Transform3D.local2outerFromLocation(tagPosWorldSpace, tagRotWorldSpace)
 
                         // transformation chain: robot to cam to tag to world
                         val cam2tag = predictTFCamToTag(detection)
@@ -181,9 +181,10 @@ class AprilTagTracking(
                         // does not know what a "3d" is.
 
                         // Extract coordinates from the resulting Transform3D and combine
-                        val robotPosXY = robot2world.offset.let { Vec2(it.x, it.y) }
-                        val robotPosZ = robot2world.offset.z
-                        val (robotHdg, robotHdgZErr) = Vec3(1.0, 0.0, 0.0).rotateByQuaternion(robot2world.rotation).let {
+                        val (robotPosWorldSpace, robotRotWorldSpace) = robot2world.local2outerToLocation()
+                        val robotPosXY = robotPosWorldSpace.let { Vec2(it.x, it.y) }
+                        val robotPosZ = robotPosWorldSpace.z
+                        val (robotHdg, robotHdgZErr) = Vec3(1.0, 0.0, 0.0).rotateByQuaternion(robotRotWorldSpace).let {
                             Pair(atan2(it.y, it.x), it.z)
                         }
                         val robotPos = Vec2Rot(robotPosXY, robotHdg)
@@ -196,11 +197,12 @@ class AprilTagTracking(
                     }
                     AprilTagUsage.TagPosition -> {
                         // transformation chain: tag to camera to robot to world
-                        val tag2Cam = predictTFTagToCam(detection)
-                        val tag2world = tag2Cam then cam2robot then robot2worldPrev
+                        val tag2cam = predictTFTagToCam(detection)
+                        val tag2world = tag2cam then cam2robot then robot2worldPrev
 
                         // This is easy because we want to report these positions in 3d space anyway.
-                        TagPositionEstimate(detection.id, tag2world.offset, tag2world.rotation)
+                        val (tagPosWorldSpace, tagRotWorldSpace) = tag2world.local2outerToLocation()
+                        TagPositionEstimate(detection.id, tagPosWorldSpace, tagRotWorldSpace)
                     }
                 }
             }

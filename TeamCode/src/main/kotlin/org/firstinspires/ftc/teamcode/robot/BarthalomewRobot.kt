@@ -8,10 +8,10 @@ import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 class BarthalomewRobot : IRobot<BarthalomewRobot.Impl> {
     private val mecanum = MecanumDrive(
+            Vec2Rot.zero,
             Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
             MecanumDrive.ReversalPattern(right = true),
             MecanumDrive.Ids.default,
-            Vec2Rot.zero
     )
 
     inner class Impl(hardwareMap: IHardwareMap) {
