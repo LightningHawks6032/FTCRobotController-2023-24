@@ -4,12 +4,25 @@ import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.IMU
 import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.util.DeltaValue
+import org.firstinspires.ftc.teamcode.util.LocTransform
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
+/*
+Layout of the odometry setup:
+
+       [yReader]
+      |
+
+       [center]    [xReader]
+      +         ---
+
+y ^
+  + >
+    x
+*/
 class TwoWheelOdometry(
-        val center: Vec2Rot,
-        val xReaderPos: Double = 1.0,
-        val yReaderPos: Double = 1.0,
+        /** Represents offset of the odometry setup relative to the robot. */
+        locationOnRobot: Vec2Rot,
         spec: Motor.PhysicalSpec,
         reversalPattern: ReversalPattern,
         ids: Ids,
@@ -18,6 +31,7 @@ class TwoWheelOdometry(
     val yReader = Motor(ids.y, spec, Motor.Config { useEncoder = true; reversed = reversalPattern.y })
     val imu = IMU(ids.imu, IMU.SpinAxis.VERTICAL)
 
+    val subassemblyTransform = LocTransform.Ground.Transform(locationOnRobot)
 
     data class ReversalPattern(
             val x: Boolean = false,
@@ -74,14 +88,12 @@ class TwoWheelOdometry(
         }
 
         fun readDelta(dt: Double): Delta {
-            val deltaX = deltaX / xReaderPos
-            val deltaY = deltaY / yReaderPos
+            val deltaX = deltaX // xReaderPos
+            val deltaY = deltaY // yReaderPos
             val deltaR = deltaR
-            val deltaPosRaw = Vec2Rot(deltaX, deltaY, deltaR)
-
-            // `rotate(center.r)` handles assembly rotation
-            val deltaPos = deltaPosRaw.transformP { it.rotate(center.r) }
-
+            val deltaPos = subassemblyTransform.localToGlobalVel(
+                    Vec2Rot(deltaX, deltaY, deltaR)
+            )
             return Delta(deltaPos, dt)
         }
     }

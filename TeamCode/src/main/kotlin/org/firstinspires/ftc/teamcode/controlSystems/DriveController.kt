@@ -18,9 +18,9 @@ class DriveController(
     var targetPos: Vec2Rot = input.pos
 
     private val pid = PID(PIDCoefficients(
-            5.0,
-            15.0,
-            10.0,
+            0.50,
+            1.50,
+            1.00,
             0.5,
     ))
     var pidCoefficients by pid::coefficients
@@ -62,7 +62,9 @@ class DriveController(
             iValue += pValue * dt
             iValue *= coefficients.iValueDecay.pow(dt)
 
-            return (pValue * coefficients.p + iValue * coefficients.i + dValue * coefficients.i)
+            println("p : $pValue  d : $dValue  i : $iValue")
+
+            return (pValue * coefficients.p + iValue * coefficients.i + dValue * coefficients.d)
         }
     }
     data class PIDCoefficients(

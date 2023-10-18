@@ -36,21 +36,21 @@ class MecanumTests {
         assert(bl.power == 0.0)
 
         // go forwards
-        mecanum.power = Vec2Rot(Vec2(0.0, 1.0), 0.0)
+        mecanum.power = Vec2Rot(Vec2(1.0, 0.0), 0.0)
         assert(fr.power == 1.0)
         assert(fl.power == 1.0)
         assert(br.power == 1.0)
         assert(bl.power == 1.0)
 
         // go backwards
-        mecanum.power = Vec2Rot(Vec2(0.0, -1.0), 0.0)
+        mecanum.power = Vec2Rot(Vec2(-1.0, 0.0), 0.0)
         assert(fr.power == -1.0)
         assert(fl.power == -1.0)
         assert(br.power == -1.0)
         assert(bl.power == -1.0)
 
         // go right
-        mecanum.power = Vec2Rot(Vec2(1.0, 0.0), 0.0)
+        mecanum.power = Vec2Rot(Vec2(0.0, -1.0), 0.0)
         assert(fr.power == -1.0)
         assert(fl.power == 1.0)
         assert(br.power == 1.0)
@@ -64,14 +64,14 @@ class MecanumTests {
         assert(bl.power == 1.0)
 
         // go forwards + right
-        mecanum.power = Vec2Rot(Vec2(0.5, 0.5), 0.0)
+        mecanum.power = Vec2Rot(Vec2(0.5, -0.5), 0.0)
         assert(fr.power == 0.0)
         assert(fl.power == 1.0)
         assert(br.power == 1.0)
         assert(bl.power == 0.0)
 
         // go forwards + counter-clockwise
-        mecanum.power = Vec2Rot(Vec2(0.0, 1.0), 1.0)
+        mecanum.power = Vec2Rot(Vec2(1.0, 0.0), 1.0)
         assert(fr.power == 2.0)
         assert(fl.power == 0.0)
         assert(br.power == 2.0)
@@ -169,7 +169,7 @@ class MecanumTests {
         val br = hardware.dcMotors[ids.br]!!
         val bl = hardware.dcMotors[ids.bl]!!
 
-        mecanum.power = Vec2Rot(Vec2(0.0, 1.0), 0.0)
+        mecanum.power = Vec2Rot(Vec2(1.0, 0.0), 0.0)
         assert(fr.power == if (frReversed) -1.0 else 1.0) { "fr: ${fr.power} != ${if (frReversed) -1.0 else 1.0} " }
         assert(fl.power == if (flReversed) -1.0 else 1.0) { "fl: ${fl.power} != ${if (flReversed) -1.0 else 1.0} " }
         assert(br.power == if (brReversed) -1.0 else 1.0) { "br: ${br.power} != ${if (brReversed) -1.0 else 1.0} " }

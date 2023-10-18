@@ -23,9 +23,9 @@ fun <T> KMutableProperty0<T>.delegate() = object : WDelegate<T> {
     var internal by this@delegate
     override fun getValue(o: Any?, p: KProperty<*>) = internal
     override fun setValue(o: Any?, p: KProperty<*>, v: T) {
-        println("SET INTERNAL $v")
+//        println("SET INTERNAL $v")
         internal = v
-        println("AFTR SET $internal")
+//        println("AFTR SET $internal")
     }
 }
 
@@ -72,7 +72,7 @@ fun <T> WDelegate<T>.conditionallyAllowWriting(
     val connectedConditionInternal by allowedWhen
     override fun getValue(o: Any?, p: KProperty<*>) = internal
     override fun setValue(o: Any?, p: KProperty<*>, v: T) {
-        println("SETTING VALUE: $v, CONNECTED: $connectedConditionInternal")
+        //println("SETTING VALUE: $v, CONNECTED: $connectedConditionInternal")
         if (connectedConditionInternal)
             internal = v
         else if (error != null)
@@ -95,8 +95,8 @@ fun <Inner, Outer> WDelegate<Inner>.transform(
     var internal by this@transform
     override fun getValue(o: Any?, p: KProperty<*>) = toOuter(internal)
     override fun setValue(o: Any?, p: KProperty<*>, v: Outer) {
-        println("setAtTimes")
+//        println("setAtTimes")
         internal = toInner(v)
-        println("after")
+//        println("after")
     }
 }

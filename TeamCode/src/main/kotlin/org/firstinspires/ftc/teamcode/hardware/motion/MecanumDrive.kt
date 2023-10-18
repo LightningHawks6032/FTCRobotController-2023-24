@@ -54,10 +54,10 @@ class MecanumDrive(
                 val (_,r) = localSpacePower
                 val (x,y) = localSpacePower.v
 
-                fr.power = y - x + r
-                fl.power = y + x - r
-                br.power = y + x + r
-                bl.power = y - x - r
+                fr.power = x + y + r
+                fl.power = x - y - r
+                br.power = x - y + r
+                bl.power = x + y - r
             }
     }
 }

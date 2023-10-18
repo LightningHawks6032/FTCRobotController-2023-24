@@ -3,6 +3,12 @@ package org.firstinspires.ftc.teamcode.hardware.motion
 import org.firstinspires.ftc.teamcode.util.LocTransform
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
+/**
+ * A class that allows the robot to know where it is at all times.
+ *
+ * Field-relative robot position follows the following conventions:
+ *   +x
+ */
 abstract class IOdometry {
 
     /** Field-relative robot acceleration. */
