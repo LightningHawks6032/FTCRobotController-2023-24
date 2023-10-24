@@ -5,13 +5,24 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 class WithTelemetry(
         private val telemetry: Telemetry,
 ) {
-    inner class Scope {
-        fun ln(ln: String) { telemetry.addLine(ln) }
+    class Partial {
+        var currentText = ""
+
+        operator fun invoke(block: WithTelemetry.Scope.()->Unit) {
+            currentText = WithTelemetry.Scope().also(block).telemetryText
+        }
+    }
+
+    class Scope internal constructor() {
+        internal var telemetryText = ""
+        fun ln(ln: String) { telemetryText += ln + "\n" }
         fun ln(ln: String, v: Any) = ln("$ln: $v")
+
+        operator fun Partial.unaryPlus() = ln(this@unaryPlus.currentText)
     }
     operator fun invoke(block: Scope.()->Unit) {
         telemetry.clear()
-        block(Scope())
+        telemetry.addLine(Scope().also(block).telemetryText)
         telemetry.update()
     }
 }

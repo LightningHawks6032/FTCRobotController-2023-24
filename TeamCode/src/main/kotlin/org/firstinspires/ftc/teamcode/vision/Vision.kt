@@ -14,7 +14,7 @@ class Vision(val webcamId: String) {
         /**
          * Creates a VisionPortal using the builder.
          */
-        fun create(vararg processors: VisProcessor.Instance, build: VisionPortal.Builder.() -> Unit = {}): VisionPortal {
+        fun create(vararg processors: VisProcessor.VisionImpl, build: VisionPortal.Builder.() -> Unit = {}): VisionPortal {
             val builder = VisionPortal.Builder()
             builder.setCamera(camera)
             build(builder)
@@ -30,7 +30,7 @@ class Vision(val webcamId: String) {
  */
 suspend fun <T : Any> LOpMode<T>.RunScope.createVisionLoop(
         vision: Vision.Impl,
-        processors: List<VisProcessor.Instance>,
+        processors: List<VisProcessor.VisionImpl>,
         build: VisionPortal.Builder.() -> Unit = {},
         /** Loop runs while condition is true. */
         condition: () -> Boolean = { duringRun },
@@ -38,7 +38,10 @@ suspend fun <T : Any> LOpMode<T>.RunScope.createVisionLoop(
         block: LOpMode.LoopScope<T>.(visionPortal: VisionPortal) -> Unit,
 ) {
     val visionPortal = vision.create(*processors.toTypedArray()) { build.invoke(this) }
-    createLoop(condition, blockDestructor = { visionPortal.close() }) {
+    createLoop(condition, blockDestructor = {
+        visionPortal.close()
+        processors.forEach { it.cleanup() }
+    }) {
         block(this@createLoop, visionPortal)
     }
 }

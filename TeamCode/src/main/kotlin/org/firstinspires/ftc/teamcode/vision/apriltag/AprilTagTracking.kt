@@ -2,15 +2,106 @@ package org.firstinspires.ftc.teamcode.vision.apriltag
 
 import org.firstinspires.ftc.teamcode.hardware.motion.IOdometry
 import org.firstinspires.ftc.teamcode.util.*
+import org.firstinspires.ftc.teamcode.vision.VisProcessor
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseRaw
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor
 import kotlin.math.absoluteValue
 import kotlin.math.atan2
 
 class AprilTagTracking(
+        /** Information about sizing and positioning of tags in the real world. */
         tagInfo: AprilTagInfoBuilder,
+        /** Whether or not to draw boxes, axes, and ids on the tags in the camera stream. */
+        val drawAnnotations: Boolean = true,
+        /** Lens information. Defaults set by FTC for most cameras, so you shouldn't have to use. */
+        val manualLensIntrinsics: LensIntrinsics? = null,
         vararg cameras: CameraPlacement,
-) {
+) : VisProcessor<AprilTagTracking.VisionImpl>() {
+    private val tagLibrary = tagInfo.buildTagLibrary()
+
+    /**
+     * Information about the lens (now in a data class). The library auto-fills these values.
+     *
+     * I have zero idea how you get these numbers, hopefully you wont need to used this.
+     */
+    data class LensIntrinsics(val fx: Double, val fy: Double, val cx: Double, val cy: Double)
+
+    inner class VisionImpl(private val camNum: Int) : VisProcessor.VisionImpl() {
+        override val ftcProcessor = with(AprilTagProcessor.Builder()) {
+            manualLensIntrinsics?.let {
+                setLensIntrinsics(it.fx, it.fy, it.cx, it.cy)
+            }
+
+            setDrawTagID(drawAnnotations)
+            setDrawTagOutline(drawAnnotations)
+            setDrawAxes(drawAnnotations)
+            setDrawCubeProjection(drawAnnotations)
+
+            setTagLibrary(tagLibrary)
+
+            build()
+        }
+
+        override fun cleanup() {
+            /* No cleanup necessary. */
+        }
+
+        /**
+         * FTCRobotController docs:
+         *
+         * > Get a list containing detections that were detected SINCE THE PREVIOUS CALL
+         * to this method, or NULL if no new detections are available. This is useful
+         * to avoid re-processing the same detections multiple times.
+         */
+        private val freshDetections: List<AprilTagDetection>?
+            get() = ftcProcessor.freshDetections?.toList()
+
+        /**
+         * FTCRobotController docs:
+         *
+         * > Get the average time in milliseconds the currently set pose
+         * solver is taking to converge on a solution **per tag**. Some pose
+         * solvers are much more expensive than others.
+         */
+        val perTagAvgPoseSolveTime: Int
+            get() = ftcProcessor.perTagAvgPoseSolveTime
+
+        var decimation: Double = 1.0
+            set(value) {
+                if (field == value) return
+                field = value
+                ftcProcessor.setDecimation(value.toFloat())
+            }
+
+        /**
+         * FTCRobotController docs:
+         *
+         * > Specify the method used to calculate 6DOF pose from the tag
+         * corner positions once found by the AprilTag algorithm.
+         */
+        fun setPoseSolver(solver: AprilTagProcessor.PoseSolver) {
+            ftcProcessor.setPoseSolver(solver)
+        }
+
+        /** Check if there are new detections and update position estimates accordingly. */
+        fun updateEstimates(
+                acceptedRobotPos: Vec2Rot,
+        ): List<AprilTagDetection>? = freshDetections?.also { detections ->
+            cameras[camNum].updateEstimates(
+                    detections,
+                    acceptedRobotPos,
+            )
+        }
+
+        init {
+            // Make sure we agree on initial value for decimation
+            ftcProcessor.setDecimation(decimation.toFloat())
+
+            setPoseSolver(solver = AprilTagProcessor.PoseSolver.OPENCV_ITERATIVE)
+        }
+    }
+
     private val tagUsages = tagInfo.buildUsages()
 
     private val cameras = cameras.map { placement -> TrackingCamera(placement) }
@@ -21,7 +112,9 @@ class AprilTagTracking(
         updatedAnyCameraN += 1
     }
 
-    inner class Odometry : IOdometry() {
+    val odometry by lazy { Odometry() }
+
+    inner class Odometry() : IOdometry() {
         private var dtAccumulated = 0.0
         private var odoUpdatedN = 0
 
@@ -77,15 +170,6 @@ class AprilTagTracking(
             return positions.mapValues { TagPositionEstimate.average(it.key, it.value) }
         }
 
-    fun updateEstimates(
-            camNum: Int,
-            detections: List<AprilTagDetection>,
-            acceptedRobotPos: Vec2Rot,
-    ) = cameras[camNum].updateEstimates(
-            detections,
-            acceptedRobotPos,
-    )
-
 
     class CameraPlacement(
             val robotSpacePos: Vec3,
@@ -107,6 +191,7 @@ class AprilTagTracking(
                 detection.let { p -> Vec3(p.x, p.y, p.z) },
                 Quaternion.fromMatrix(detection.R)
         )
+
         private fun predictTFCamToTagPure(posePos: Vec3, poseRot: Quaternion): Transform3D {
 
             val rotated = poseRot.inverse.apply(posePos)
@@ -122,6 +207,7 @@ class AprilTagTracking(
                 detection.let { p -> Vec3(p.x, p.y, p.z) },
                 Quaternion.fromMatrix(detection.R),
         )
+
         @UnstableUnfinished
         private fun predictTFTagToCamPure(posePos: Vec3, poseRot: Quaternion): Transform3D {
             val tagPosCamSpace = posePos.let { Vec3(it.z, -it.x, -it.y) } * 0.85
