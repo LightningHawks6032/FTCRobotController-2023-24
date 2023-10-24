@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.util
 
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
-
 data class Transform3D(
         private val offset: Vec3,
         private val rotation: Quaternion,
@@ -32,12 +30,12 @@ data class Transform3D(
     fun transformFwd(rot: Quaternion): Quaternion = // q r
             rotation * rot
     fun transformInv(vec: Vec3) = // q' (v - t) q
-            rotation.inverse().apply(vec - offset)
+            rotation.inverse.apply(vec - offset)
     fun transformInv(rot: Quaternion): Quaternion = // q' r
-            rotation.inverse() * rot
+            rotation.inverse * rot
 
     fun inverse() = // T = q' -t q ; Q = q'
-            Transform3D(rotation.inverse().apply(-offset), rotation.inverse())
+            Transform3D(rotation.inverse.apply(-offset), rotation.inverse)
 
     // transformFwd(transformInv( (v, r) ))
     //   -> (q q' (v - t) q q' + t ,  q q' r) = (1 (v-t) 1 + t ,  1 r) = (v, r)  // correct

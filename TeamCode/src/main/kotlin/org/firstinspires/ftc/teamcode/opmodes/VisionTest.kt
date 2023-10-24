@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.robotcore.external.navigation.Quaternion
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
+import org.firstinspires.ftc.teamcode.util.Quaternion
+import org.firstinspires.ftc.teamcode.util.UnstableUnfinished
 import org.firstinspires.ftc.teamcode.util.Vec3
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagInfoBuilder
@@ -55,6 +56,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
                 ln("r: ${robot.aprilTagOdometry.pos.r}")
                 ln("-------------------")
             }
+            @OptIn(UnstableUnfinished::class)
             for (tagLoc in robot.aprilTagTracking.tagPositionEstimates.values) {
                 println("${tagLoc.id} :: ${tagLoc.pos}")
             }
@@ -77,28 +79,28 @@ class VisionTestRobot : IRobot<VisionTestRobot.Impl> {
                 "test",
                 4.0,
                 Vec3(0.0, 0.0, 0.0),
-                Quaternion(1f, 0f, 0f, 0f, 0),
+                Quaternion(1.0, 0.0, 0.0, 0.0),
         )
 //        addForRobotPos(
 //                584,
 //                "test",
 //                4.0,
 //                Vec3(10.0, 10.0, 10.0),
-//                Quaternion(1f, 0f, 0f, 0f, 0),
+//                Quaternion(1.0, 0.0, 0.0, 0.0),
 //        )
         addForRobotPos(
                 583,
                 "test2",
                 4.0,
                 Vec3(0.0, 0.0, 0.0),
-                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
+                Quaternion(0.707, 0.0, 0.0, 0.707),
         )
 //        addForRobotPos(
 //                583,
 //                "test2",
 //                4.0,
 //                Vec3(10.0, 10.0, 0.0),
-//                Quaternion(0.707f, 0f, 0f, 0.707f, 0),
+//                Quaternion(0.707, 0.0, 0.0, 0.707),
 //        )
         addForTagPos(585, "loc", 6.0)
     }
