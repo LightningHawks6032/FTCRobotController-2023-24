@@ -81,7 +81,7 @@ class VisionTest : LOpMode<VisionTestRobot.Impl>(visionTestRobot, {
             if (recognitions != null) {
                 // Report our findings
                 tfodTelemetry {
-                    ln("tensorflow? yes.")
+                    ln("tensorflow? yes. (${recognitions.size}}")
                     for (recognition in recognitions) {
                         ln("${recognition.label}: (${
                             recognition.let { ((it.left + it.right)/2).roundToInt() }

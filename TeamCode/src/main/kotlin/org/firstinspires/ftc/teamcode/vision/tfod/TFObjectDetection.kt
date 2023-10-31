@@ -19,11 +19,25 @@ class TFObjectDetection(
             ftcProcessor.shutdown()
         }
 
+        var minConfidence: Double = -1.0
+            get() = field
+            set(value) {
+                ftcProcessor.setMinResultConfidence(value.toFloat())
+                field = value
+            }
+
+
+        init {
+            minConfidence = 0.75
+        }
+
+
         /** Gets a list containing recognitions that were detected
          * since the last call to this method, or null if no new
          * recognitions are available. This is useful to avoid
          * re-processing the same recognitions multiple times. */
         val freshRecognitions: List<Recognition>?
-            get() = ftcProcessor.freshRecognitions
+            get() = ftcProcessor.recognitions
+//        get() = ftcProcessor.freshRecognitions
     }
 }
