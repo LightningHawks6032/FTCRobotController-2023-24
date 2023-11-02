@@ -43,6 +43,7 @@ class Motor(
             val encoderOnly: Boolean = false,
     ) {
         GOBILDA_5202_0002_0005(145.1),
+        GOBILDA_5202_0002_0003(103.8),
         GOBILDA_ODOMETRY_POD(2000.0, encoderOnly = true),
         REV_THROUGH_BORE_ENCODER(8192.0, encoderOnly = true);
 

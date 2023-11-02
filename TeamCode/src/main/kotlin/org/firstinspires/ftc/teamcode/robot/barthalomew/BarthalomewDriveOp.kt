@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.old
+package org.firstinspires.ftc.teamcode.robot.barthalomew
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -20,7 +20,7 @@ class BarthalomewDriveOp : LOpMode<BarthalomewRobot.Impl>(BarthalomewRobot.main,
         val speed = if (speedButton) 0.5 else 0.25
 
         robot.drive(Vec2Rot(
-                v = gamepadA.stick.left.pos * Vec2(-1.0, 1.0),
+                v = gamepadA.stick.left.pos.let { Vec2(it.y, it.x) },
                 r = gamepadA.stick.right.pos.x,
         ) * speed)
     }

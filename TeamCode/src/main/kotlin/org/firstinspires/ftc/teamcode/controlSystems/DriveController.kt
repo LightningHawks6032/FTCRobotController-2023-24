@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.controlSystems
 import org.firstinspires.ftc.teamcode.controlSystems.motionPath.MotionPath
 import org.firstinspires.ftc.teamcode.hardware.motion.IDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.IOdometry
+import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import kotlin.math.abs
 import kotlin.math.max
@@ -14,6 +15,13 @@ class DriveController(
         private val output: IDrive,
         private val input: IOdometry,
 ) {
+    @NotForCompetition
+    fun debugTakeControl(): Pair<IOdometry, IDrive> {
+        disableTicking = true
+        return Pair(input, output)
+    }
+    private var disableTicking = false
+
     var path: MotionPath<Vec2Rot>? = null
     var targetPos: Vec2Rot = input.pos
 
@@ -27,6 +35,8 @@ class DriveController(
 
     var t = 0.0
     fun tick(dt: Double) {
+        if (disableTicking) return // disables ticking when [debugTakeControlOfOutput] is called.
+
         t += dt
         input.tick(dt)
 
