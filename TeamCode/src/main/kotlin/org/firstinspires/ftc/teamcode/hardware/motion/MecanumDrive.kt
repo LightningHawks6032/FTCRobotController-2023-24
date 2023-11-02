@@ -13,8 +13,8 @@ class MecanumDrive(
 ) {
     val frRef = Motor(ids.fr, motorSpec, Motor.Config { reversed = reversalPattern.fr })
     val flRef = Motor(ids.fl, motorSpec, Motor.Config { reversed = reversalPattern.fl })
-    val brRef = Motor(ids.br, motorSpec, Motor.Config { reversed = reversalPattern.br })
     val blRef = Motor(ids.bl, motorSpec, Motor.Config { reversed = reversalPattern.bl })
+    val brRef = Motor(ids.br, motorSpec, Motor.Config { reversed = reversalPattern.br })
 
     val assembly2robotTransform = Transform2D.local2outerFromLocation(assemblyLocationRobotSpace)
 

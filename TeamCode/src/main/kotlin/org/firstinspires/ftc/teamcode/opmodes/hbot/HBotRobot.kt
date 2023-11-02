@@ -26,7 +26,9 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
                     bl = "bl", // back-left motor
             ),
     )
+    private val InTake = HBotInTake(
 
+    )
     const val MM_TO_IN = 0.03937008
     //
     private val threeWheelOdometry = ThreeWheelOdometry(
@@ -68,7 +70,7 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
         }
 
         val drive = DriveController(mecanum.Impl(hardwareMap), odometry)
-
+        val Intake = HBotRobot.InTake.Impl(hardwareMap)
         fun updateAprilTag(impl: AprilTagTracking.VisionImpl) =
                 impl.updateEstimates(odometry.pos)
 
