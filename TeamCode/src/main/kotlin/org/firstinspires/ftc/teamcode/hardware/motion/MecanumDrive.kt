@@ -9,7 +9,7 @@ class MecanumDrive(
         assemblyLocationRobotSpace: Vec2Rot,
         motorSpec: Motor.PhysicalSpec,
         reversalPattern: ReversalPattern,
-        ids: Ids,
+        val ids: Ids,
 ) {
     val frRef = Motor(ids.fr, motorSpec, Motor.Config { reversed = reversalPattern.fr })
     val flRef = Motor(ids.fl, motorSpec, Motor.Config { reversed = reversalPattern.fl })

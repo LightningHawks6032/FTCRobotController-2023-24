@@ -32,6 +32,7 @@ class ThreeWheelOdometry(
         /** Offset in the +y direction, facing along the x axis (movement towards +x should be read as positive number)  */
         val x1ReaderPos: Double = 1.0,
         spec: Motor.PhysicalSpec,
+        val wheelRadiiInches: Double = 1.0,
         reversalPattern: ReversalPattern,
         ids: Ids,
 ) : IOdometry() {

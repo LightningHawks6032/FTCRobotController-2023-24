@@ -13,6 +13,15 @@ class WithTelemetry(
         }
     }
 
+    fun EXAMPLE(f : Telemetry) {
+        val the = WithTelemetry(f)
+
+
+        the {
+            ln("uefsidsfui")
+        }
+    }
+
     class Scope internal constructor() {
         internal var telemetryText = ""
         fun ln(ln: String) { telemetryText += ln + "\n" }
