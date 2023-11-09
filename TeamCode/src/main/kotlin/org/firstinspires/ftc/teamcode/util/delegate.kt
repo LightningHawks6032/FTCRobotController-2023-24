@@ -100,3 +100,24 @@ fun <Inner, Outer> WDelegate<Inner>.transform(
 //        println("after")
     }
 }
+
+
+fun <T> RDelegate<T>.rezeroable(ops: Ops<T>) = object : WDelegate<T> {
+    val internal by this@rezeroable
+    var center = ops.zero
+    override fun getValue(o: Any?, p: KProperty<*>): T {
+        return ops.add(internal, center) // internal + center
+    }
+    override fun setValue(o: Any?, p: KProperty<*>, v: T) {
+        center = ops.sub(v, internal) // v - internal
+    }
+}
+
+fun <T> WDelegate<T>.withWriteEffect(callback: (()->Unit)->Unit) = object : WDelegate<T> {
+    var internal by this@withWriteEffect
+    override fun getValue(o: Any?, p: KProperty<*>) = internal
+    override fun setValue(o: Any?, p: KProperty<*>, v: T) {
+
+        internal = v
+    }
+}

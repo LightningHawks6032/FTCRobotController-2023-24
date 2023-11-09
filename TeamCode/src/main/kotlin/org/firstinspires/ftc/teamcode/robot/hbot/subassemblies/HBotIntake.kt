@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.robot.hbot.subassemblies
 
+import org.firstinspires.ftc.teamcode.controlSystems.ActuatorPositionController
+import org.firstinspires.ftc.teamcode.controlSystems.PID1D
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
+import org.firstinspires.ftc.teamcode.util.delegate
+import org.firstinspires.ftc.teamcode.util.withWriteEffect
 
 
 class HBotIntake(
         doReverse: Boolean = false,
+        private val pidCoefficients: PID1D.Coefficients,
 ) {
     private val armRRef = Motor("ar", Motor.PhysicalSpec.GOBILDA_5202_0002_0005, Motor.Config { reversed = doReverse })
     private val armLRef = Motor("al", Motor.PhysicalSpec.GOBILDA_5202_0002_0005, Motor.Config { reversed = doReverse.not() })
@@ -14,6 +19,11 @@ class HBotIntake(
         private val armR = armRRef.Impl(hardware)
         private val armL = armLRef.Impl(hardware)
 
+        private fun onEditZeroPos(it: ()->Unit) {
+            controller.posZeroPointEdit(it)
+        }
+
+        var pos by armR::pos.delegate().withWriteEffect { onEditZeroPos(it) }
         var power = 0.0
             set(power) {
                 field = power
@@ -21,20 +31,8 @@ class HBotIntake(
                 armL.power = power
             }
 
-        // TODO: PID control
+        val controller = ActuatorPositionController(pidCoefficients, this::power, this::pos)
+        fun tick(dt: Double) = controller.tick(dt)
+
     }
 }
-
-/* override var power: Vec2Rot = Vec2Rot.zero
-            set(newPower) {
-                field = newPower
-                val localSpacePower = assembly2robotTransform.transformVelInv(newPower)
-                val (_,r) = localSpacePower
-                val (x,y) = localSpacePower.v
-
-                fr.power = x + y + r
-                fl.power = x - y - r
-                br.power = x - y + r
-                bl.power = x + y - r
-
- */

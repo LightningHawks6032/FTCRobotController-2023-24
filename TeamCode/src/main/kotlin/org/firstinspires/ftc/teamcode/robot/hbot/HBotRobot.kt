@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.robot.hbot
 
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.controlSystems.DriveController
+import org.firstinspires.ftc.teamcode.controlSystems.PID1D
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.Motor
@@ -83,8 +84,28 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
     private val visionCam0 = Vision("cam front")
     private val visionCam1 = Vision("cam back")
 
-    private val intakeRef = HBotIntake()
-    private val outtakeRef = HBotOuttake()
+    private val intakeRef = HBotIntake(
+            false,
+            PID1D.Coefficients(
+                    P = 1.0,
+                    I = 0.2,
+                    D = 0.5,
+                    iDecay = 4.0,
+                    biasSlope = 10.0,
+                    bias = 0.2,
+            )
+    )
+    private val outtakeRef = HBotOuttake(
+            false,
+            PID1D.Coefficients(
+                    P = 1.0,
+                    I = 0.2,
+                    D = 0.5,
+                    iDecay = 4.0,
+                    biasSlope = 10.0,
+                    bias = 0.2,
+            )
+    )
 
 
     class Impl(hardwareMap: IHardwareMap) {
