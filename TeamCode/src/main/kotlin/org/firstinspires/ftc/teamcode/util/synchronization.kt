@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.util
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class TriggerLock : LockWaiter {
+class TriggerLock(private val relock: Boolean = false) : LockWaiter {
     private val mutex = Mutex(locked = true)
 
     fun unlock() = synchronized(mutex) {
@@ -12,7 +12,9 @@ class TriggerLock : LockWaiter {
 
     override suspend fun wait() =
             mutex.lock().also {
-                unlock()
+                if (!relock) {
+                    unlock()
+                }
             }
 
     override val locked get() = mutex.isLocked

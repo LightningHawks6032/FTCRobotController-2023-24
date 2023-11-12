@@ -8,30 +8,31 @@ class WithTelemetry(
     class Partial {
         var currentText = ""
 
-        operator fun invoke(block: WithTelemetry.Scope.()->Unit) {
-            currentText = WithTelemetry.Scope().also(block).telemetryText
-        }
-    }
-
-    fun EXAMPLE(f : Telemetry) {
-        val the = WithTelemetry(f)
-
-
-        the {
-            ln("uefsidsfui")
+        operator fun invoke(block: Scope.() -> Unit) {
+            currentText = Scope().also(block).telemetryText
         }
     }
 
     class Scope internal constructor() {
         internal var telemetryText = ""
-        fun ln(ln: String) { telemetryText += ln + "\n" }
+        fun ln(ln: String) {
+            telemetryText += ln + "\n"
+        }
+
+        fun ln() = ln("")
+
         fun ln(ln: String, v: Any) = ln("$ln: $v")
 
         operator fun Partial.unaryPlus() = ln(this@unaryPlus.currentText)
     }
-    operator fun invoke(block: Scope.()->Unit) {
+
+    operator fun invoke(printToConsole: Boolean = false, block: Scope.() -> Unit) {
         telemetry.clear()
-        telemetry.addLine(Scope().also(block).telemetryText)
+        val text = Scope().also(block).telemetryText
+        telemetry.addLine(text)
+        if (printToConsole) {
+            println("//////////// TELEMETRY OUTPUT ////////////\n$text")
+        }
         telemetry.update()
     }
 }
