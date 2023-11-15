@@ -9,7 +9,7 @@ import kotlin.math.PI
 import kotlin.math.pow
 
 @TeleOp
-@OptIn(NotForCompetition::class)
+@NotForCompetition
 class HBotSemiAutoDriveTestOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
     val runOdometryNotDriveModeVarName = "mode: odometry (true), drive (false)"
     selectDebugBool(runOdometryNotDriveModeVarName)

@@ -45,6 +45,7 @@ operator fun WDelegate<Double>.plus(fac: ()->Double) =
                 toOuter = { it + fac() },
                 toInner = { it - fac() }
         )
+operator fun WDelegate<Double>.minus(fac: ()->Double) = this + { -fac() }
 
 operator fun RDelegate<Boolean>.not() =
         transform { !it }
@@ -74,6 +75,21 @@ fun <T> WDelegate<T>.conditionallyAllowWriting(
     override fun setValue(o: Any?, p: KProperty<*>, v: T) {
         //println("SETTING VALUE: $v, CONNECTED: $connectedConditionInternal")
         if (connectedConditionInternal)
+            internal = v
+        else if (error != null)
+            throw error
+    }
+}
+inline fun <T> WDelegate<T>.conditionallyZeroOut(
+        zero: T,
+        error: Throwable? = null,
+        crossinline zeroed: () -> Boolean,
+) = object : WDelegate<T> {
+    var internal by this@conditionallyZeroOut
+    override fun getValue(o: Any?, p: KProperty<*>) = if (zeroed()) zero else internal
+    override fun setValue(o: Any?, p: KProperty<*>, v: T) {
+        //println("SETTING VALUE: $v, CONNECTED: $connectedConditionInternal")
+        if (!zeroed())
             internal = v
         else if (error != null)
             throw error
@@ -113,11 +129,20 @@ fun <T> RDelegate<T>.rezeroable(ops: Ops<T>) = object : WDelegate<T> {
     }
 }
 
-fun <T> WDelegate<T>.withWriteEffect(callback: (()->Unit)->Unit) = object : WDelegate<T> {
+fun <T> WDelegate<T>.withWriteEffect(callback: (doEdit: ()->Unit)->Unit) = object : WDelegate<T> {
     var internal by this@withWriteEffect
     override fun getValue(o: Any?, p: KProperty<*>) = internal
     override fun setValue(o: Any?, p: KProperty<*>, v: T) {
-
+        callback {
+            internal = v
+        }
+    }
+}
+fun <T> WDelegate<T>.withAfterWriteEffect(callback: (T)->Unit) = object : WDelegate<T> {
+    var internal by this@withAfterWriteEffect
+    override fun getValue(o: Any?, p: KProperty<*>) = internal
+    override fun setValue(o: Any?, p: KProperty<*>, v: T) {
         internal = v
+        callback(v)
     }
 }

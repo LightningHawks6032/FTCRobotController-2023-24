@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 @TeleOp(name = "Drive")
-@OptIn(NotForCompetition::class)
-class HBotDriveOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
+@NotForCompetition
+class HBotTestDriveOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
     val (odometry, drive) = robot.drive.debugTakeControl()
 
     val odoTelemetry = WithTelemetry.Partial()

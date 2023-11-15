@@ -36,7 +36,12 @@ DCMotor Mappings:
 - "l1": out take lifter linear slide motor (the other one)
 
 Servo Mappings:
-TODO TBD
+- "ir": intake input servo, right
+- "il": intake input servo, left
+- "tr": intake transfer/mid-take servo, right
+- "tl": intake transfer/mid-take servo, left
+- "or": outtake dropper servo, right
+- "ol": outtake dropper servo, left
 
  */
 object HBotRobot : IRobot<HBotRobot.Impl> {
@@ -52,14 +57,17 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
             ),
     )
     private val threeWheelOdometry = ThreeWheelOdometry(
-            Vec2Rot(Vec2(6.0, -2.0) * MM_TO_IN, PI / 2), // yReaderPos is in front
-            yReaderPos = 179.0 * MM_TO_IN,
+            Vec2Rot((Vec2(6.0 - 115.0, -2.0) * MM_TO_IN).rotate(PI / 2), PI / 2), // yReaderPos is in front
+            yReaderPos = (179.0 + 115.0) * MM_TO_IN,
             x0ReaderPos = 94.0 * MM_TO_IN,
             x1ReaderPos = -98.0 * MM_TO_IN,
             Motor.PhysicalSpec.GOBILDA_ODOMETRY_POD,
             1.75 / 2.0,
-            ThreeWheelOdometry.ReversalPattern(
+            ThreeWheelOdometry.ReversalPattern( // 115
                     // TODO
+                    y = false,
+                    x0 = false,
+                    x1 = true,
             ),
             ThreeWheelOdometry.Ids(mecanum.ids.fr, mecanum.ids.bl, mecanum.ids.br),
     )

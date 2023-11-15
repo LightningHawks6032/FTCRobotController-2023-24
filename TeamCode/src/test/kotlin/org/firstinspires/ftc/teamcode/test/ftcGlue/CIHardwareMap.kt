@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.test.ftcGlue
 
 import org.firstinspires.ftc.teamcode.ftcGlue.IDCMotor
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
+import org.firstinspires.ftc.teamcode.ftcGlue.IServo
 import org.junit.Test
 import kotlin.reflect.KClass
 
 class CIHardwareMap : IHardwareMap {
     override val dcMotors: IHardwareMap.SubMap<IDCMotor> = SubMap { CIDCMotor() }
+    override val servos: IHardwareMap.SubMap<IServo> = SubMap { CIServo() }
 
     val requested = mutableMapOf<String,Any?>()
 
