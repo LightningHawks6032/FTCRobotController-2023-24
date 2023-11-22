@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.hbot
+package org.firstinspires.ftc.teamcode.robot.arbot
 
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.controlSystems.DriveController
@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.hardware.motion.CompoundOdometry
 import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.ThreeWheelOdometry
-import org.firstinspires.ftc.teamcode.robot.hbot.subassemblies.HBotIntake
-import org.firstinspires.ftc.teamcode.robot.hbot.subassemblies.HBotOuttake
+import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotIntake
+import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotOuttake
 import org.firstinspires.ftc.teamcode.util.MM_TO_IN
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
@@ -45,7 +45,7 @@ Servo Mappings:
 - "ol" (`CH[5]`): outtake dropper servo, left
 
  */
-object HBotRobot : IRobot<HBotRobot.Impl> {
+object ArBotRobot : IRobot<ArBotRobot.Impl> {
     private val mecanum = MecanumDrive(
             Vec2Rot.zero,
             Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
@@ -93,7 +93,7 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
     private val visionCam0 = Vision("cam front")
     private val visionCam1 = Vision("cam back")
 
-    private val intakeRef = HBotIntake(
+    private val intakeRef = ArBotIntake(
             true,
             PID1D.Coefficients(
                     P = 1.0,
@@ -104,7 +104,7 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
                     bias = 0.2,
             )
     )
-    private val outtakeRef = HBotOuttake(
+    private val outtakeRef = ArBotOuttake(
             false,
             PID1D.Coefficients(
                     P = 1.0,

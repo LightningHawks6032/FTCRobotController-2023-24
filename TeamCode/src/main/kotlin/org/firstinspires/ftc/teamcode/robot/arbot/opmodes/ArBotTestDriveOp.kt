@@ -1,16 +1,16 @@
-package org.firstinspires.ftc.teamcode.robot.hbot.opmodes
+package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
-import org.firstinspires.ftc.teamcode.robot.hbot.HBotRobot
+import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 
 @TeleOp(name = "Drive")
 @NotForCompetition
-class HBotTestDriveOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
+class ArBotTestDriveOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val (odometry, drive) = robot.drive.debugTakeControl()
 
     val odoTelemetry = WithTelemetry.Partial()

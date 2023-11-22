@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.robot.hbot.opmodes
+package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
-import org.firstinspires.ftc.teamcode.robot.hbot.HBotRobot
+import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.*
 import kotlin.math.PI
 
 @OptIn(NotForCompetition::class)
 @TeleOp
-class HBotTeleOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
+class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val intakeArmAtOuttakeDropOff = PI/6
     val outtakeArmMaxHeight = 36.0
     robot.intake.pos = intakeArmAtOuttakeDropOff // assert that we start here

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.hbot.subassemblies
+package org.firstinspires.ftc.teamcode.robot.arbot.subassemblies
 
 import org.firstinspires.ftc.teamcode.controlSystems.ActuatorPositionController
 import org.firstinspires.ftc.teamcode.controlSystems.PID1D
@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.*
 
 private const val IN_PER_RAD_OUTTAKE_SLIDES = 1.0 // TODO
 
-class HBotOuttake(
+class ArBotOuttake(
         doReverse: Boolean = false,
         private val pidCoefficients: PID1D.Coefficients,
 ) {
@@ -41,7 +41,7 @@ class HBotOuttake(
         val controller = ActuatorPositionController(pidCoefficients, this::power, this::pos)
         fun tick(dt: Double) = controller.tick(dt)
 
-        var outputServosOpen by this@HBotOuttake::outputServosOpen.delegate().withAfterWriteEffect { open ->
+        var outputServosOpen by this@ArBotOuttake::outputServosOpen.delegate().withAfterWriteEffect { open ->
             outputServos.pos = if (open) 0.0 else 1.0
         }
         @NotForCompetition
@@ -49,7 +49,7 @@ class HBotOuttake(
 
         init {
             // update servo positions
-            outputServosOpen = this@HBotOuttake.outputServosOpen
+            outputServosOpen = this@ArBotOuttake.outputServosOpen
         }
     }
 }

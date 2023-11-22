@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.hbot.subassemblies
+package org.firstinspires.ftc.teamcode.robot.arbot.subassemblies
 
 import org.firstinspires.ftc.teamcode.controlSystems.ActuatorPositionController
 import org.firstinspires.ftc.teamcode.controlSystems.PID1D
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.withAfterWriteEffect
 import org.firstinspires.ftc.teamcode.util.withWriteEffect
 
 
-class HBotIntake(
+class ArBotIntake(
         doReverse: Boolean = false,
         private val pidCoefficients: PID1D.Coefficients,
 ) {
@@ -47,10 +47,10 @@ class HBotIntake(
         val controller = ActuatorPositionController(pidCoefficients, this::power, this::pos)
         fun tick(dt: Double) = controller.tick(dt)
 
-        var inputServosOpen by this@HBotIntake::inputServosOpen.delegate().withAfterWriteEffect { open ->
+        var inputServosOpen by this@ArBotIntake::inputServosOpen.delegate().withAfterWriteEffect { open ->
             inputServos.pos = if (open) 0.0 else 1.0
         }
-        var transferServosOpen by this@HBotIntake::transferServosOpen.delegate().withAfterWriteEffect { open ->
+        var transferServosOpen by this@ArBotIntake::transferServosOpen.delegate().withAfterWriteEffect { open ->
             transferServos.pos = if (open) 0.0 else -1.0
         }
 
@@ -61,8 +61,8 @@ class HBotIntake(
 
         init {
             // update the servos
-            inputServosOpen = this@HBotIntake.inputServosOpen
-            transferServosOpen = this@HBotIntake.transferServosOpen
+            inputServosOpen = this@ArBotIntake.inputServosOpen
+            transferServosOpen = this@ArBotIntake.transferServosOpen
         }
     }
 }

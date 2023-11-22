@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.robot.hbot.opmodes
+package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
-import org.firstinspires.ftc.teamcode.robot.hbot.HBotRobot
+import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 
 @TeleOp
-class HBotTestIntakeOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
+class ArBotTestIntakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     robot.intake.pos = 0.0
 
     waitForStart()
