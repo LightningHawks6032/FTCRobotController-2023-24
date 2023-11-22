@@ -26,7 +26,7 @@ class HBotOuttake(
     private var outputServosOpen = false
 
     inner class Impl(hardwareMap: IHardwareMap) {
-        private val lifter = lifterRef.Impl(hardwareMap)
+         val lifter = lifterRef.Impl(hardwareMap)
         private val outputServos = outputServosRef.Impl(hardwareMap)
 
         private fun onEditZeroPos(it: ()->Unit) {

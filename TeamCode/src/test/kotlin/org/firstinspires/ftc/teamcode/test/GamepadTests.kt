@@ -21,7 +21,7 @@ class GamepadTests {
         var timesPressedOnce = 0
         var timesChanged = 0
 
-        button.Watch(watchList).also {
+        button.Watch().also { watchList.add(it) }.also {
             it.changed.bind { isHeld ->
                 assert(isHeld == state)
                 timesChanged++
@@ -77,10 +77,10 @@ class GamepadTests {
         gamepad.b = false
         gamepad.x = false
         gamepad.y = false
-        gamepadWrapped.a.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.b.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.x.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.y.Watch(watchList).pressed.once { evCallCount++ }
+        gamepadWrapped.a.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.b.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.x.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.y.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
         gamepad.a = true
         gamepad.b = true
         gamepad.x = true
@@ -88,15 +88,15 @@ class GamepadTests {
 
         gamepad.bumperLeft = false
         gamepad.bumperRight = false
-        gamepadWrapped.bumper.left.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.bumper.right.Watch(watchList).pressed.once { evCallCount++ }
+        gamepadWrapped.bumper.left.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.bumper.right.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
         gamepad.bumperLeft = true
         gamepad.bumperRight = true
 
         gamepad.stickLeftButton = false
         gamepad.stickRightButton = false
-        gamepadWrapped.stick.left.button.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.stick.right.button.Watch(watchList).pressed.once { evCallCount++ }
+        gamepadWrapped.stick.left.button.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.stick.right.button.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
         gamepad.stickLeftButton = true
         gamepad.stickRightButton = true
 
@@ -104,10 +104,10 @@ class GamepadTests {
         gamepad.dpadUp = false
         gamepad.dpadLeft = false
         gamepad.dpadRight = false
-        gamepadWrapped.dpad.up.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.dpad.down.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.dpad.left.Watch(watchList).pressed.once { evCallCount++ }
-        gamepadWrapped.dpad.right.Watch(watchList).pressed.once { evCallCount++ }
+        gamepadWrapped.dpad.up.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.dpad.down.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.dpad.left.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
+        gamepadWrapped.dpad.right.Watch().also { watchList.add(it) }.pressed.once { evCallCount++ }
         gamepad.dpadDown = true
         gamepad.dpadUp = true
         gamepad.dpadLeft = true

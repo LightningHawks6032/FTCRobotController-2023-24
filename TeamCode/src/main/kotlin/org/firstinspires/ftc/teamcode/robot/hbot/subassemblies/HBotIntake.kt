@@ -26,14 +26,14 @@ class HBotIntake(
     )
     private val transferServosRef = TandemGroup.Servo(
             Servo("tr", continuousRotation = false, Servo.Config { reversed = false }), // TODO
-            Servo("tl", continuousRotation = false, Servo.Config { reversed = true }),
+//            Servo("tl", continuousRotation = false, Servo.Config { reversed = true }),
     )
 
     private var inputServosOpen = false
     private var transferServosOpen = false
 
     inner class Impl(hardware: IHardwareMap) {
-        private val arm = armRef.Impl(hardware)
+         val arm = armRef.Impl(hardware)
         private val inputServos = inputServosRef.Impl(hardware)
         private val transferServos = transferServosRef.Impl(hardware)
 

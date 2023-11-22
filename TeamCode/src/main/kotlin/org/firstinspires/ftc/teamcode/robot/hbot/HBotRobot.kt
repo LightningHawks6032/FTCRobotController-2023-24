@@ -23,25 +23,26 @@ import kotlin.math.PI
 
 /**
 
+ KEY: `CH[3]` &rarr; Control Hub Port 3, `EH[0]` &rarr; Expansion Hub Port 0
+
 DCMotor Mappings:
-- "fr": front right drive motor, front odometry wheel
-- "fl": front left drive motor
-- "br": back right drive motor, right odometry wheel
-- "bl": back left drive motor, left odometry wheel
+- "fr" (`CH[2]`): front right drive motor, front odometry wheel
+- "fl" (`CH[3]`): front left drive motor
+- "br" (`CH[1]`): back right drive motor, right odometry wheel
+- "bl" (`CH[0]`): back left drive motor, left odometry wheel
 
-- "ar": right intake arm motor
-- "al": left intake arm motor
+- "ar": (`EH[0]`) right intake arm motor
+- "al": (`EH[1]`) left intake arm motor
 
-- "l0": out take lifter linear slide motor
-- "l1": out take lifter linear slide motor (the other one)
+- "l0": (`EH[2]`) out take lifter linear slide motor
+- "l1": (`EH[3]`) out take lifter linear slide motor (the other one)
 
 Servo Mappings:
-- "ir": intake input servo, right
-- "il": intake input servo, left
-- "tr": intake transfer/mid-take servo, right
-- "tl": intake transfer/mid-take servo, left
-- "or": outtake dropper servo, right
-- "ol": outtake dropper servo, left
+- "ir" (`CH[0]`): intake input servo, right
+- "il" (`CH[1]`): intake input servo, left
+- "tr" (`CH[2]`): intake transfer/mid-take servo
+- "or" (`CH[4]`): outtake dropper servo, right
+- "ol" (`CH[5]`): outtake dropper servo, left
 
  */
 object HBotRobot : IRobot<HBotRobot.Impl> {
@@ -93,7 +94,7 @@ object HBotRobot : IRobot<HBotRobot.Impl> {
     private val visionCam1 = Vision("cam back")
 
     private val intakeRef = HBotIntake(
-            false,
+            true,
             PID1D.Coefficients(
                     P = 1.0,
                     I = 0.2,

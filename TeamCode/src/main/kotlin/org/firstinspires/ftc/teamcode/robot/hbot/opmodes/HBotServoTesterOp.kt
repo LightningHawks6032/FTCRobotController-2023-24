@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot.hbot.opmodes
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.robot.hbot.HBotRobot
 import org.firstinspires.ftc.teamcode.util.NotForCompetition
 
 @NotForCompetition
+@TeleOp
 class HBotServoTesterOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
     withTelemetry {
         ln("HBot servo tester")
@@ -22,11 +24,13 @@ class HBotServoTesterOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
         watches(gamepadA.dpad.up::Watch) {
             it.pressed.bind {
                 i += 1
+                if (i >= n) i = 0
             }
         }
         watches(gamepadA.dpad.down::Watch) {
             it.pressed.bind {
                 i -= 1
+                if (i < 0) i = n-1
             }
         }
         val j = (i%n+n)%n
@@ -34,9 +38,9 @@ class HBotServoTesterOp : LOpMode<HBotRobot.Impl>(HBotRobot, {
         servos[i].pos = gamepadA.stick.right.pos.x
 
         withTelemetry {
-            ln("servo group positions:")
+            ln("servo group positions: $i $j ${gamepadA.dpad.up.isHeld}")
             for (k in 0 until n) {
-                ln("${if (j == k) "> " else ""}${labels[i]}", servos[i].pos)
+                ln("${if (j == k) "> " else ""}${labels[k]}", servos[k].pos)
             }
         }
     }

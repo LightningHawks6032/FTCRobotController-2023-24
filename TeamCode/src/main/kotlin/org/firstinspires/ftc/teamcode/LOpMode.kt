@@ -184,9 +184,14 @@ open class LOpMode<T : Any>(
                 try {
                     val loopScope = LoopScopeImpl()
                     while (condition()) {
+                        yield()
                         try {
                             if (loopScope.dt.isFinite() && loopScope.dt > 0.0)
                                 block(loopScope)
+                            else {
+                                loopScope.updateDT()
+                                continue
+                            }
                         } catch (_: LoopScope.Continue) {
                             // let the loop continue to next iteration
                         } catch (_: LoopScope.Break) {
@@ -203,7 +208,7 @@ open class LOpMode<T : Any>(
     }
 
     interface LoopScope<T> : OpBaseScope<T> {
-        fun <K : WatchList.Watchable> watches(gen: (WatchList) -> K, block: (K) -> Unit)
+        fun <K : WatchList.Watchable> watches(gen: () -> K, block: (K) -> Unit)
 
         object Break : Throwable()
         object Continue : Throwable()
@@ -215,18 +220,21 @@ open class LOpMode<T : Any>(
 
     inner class LoopScopeImpl : LoopScope<T>, OpBaseScope<T> by this {
         private val watchList = WatchList()
-        override fun <K : WatchList.Watchable> watches(gen: (WatchList) -> K, block: (K) -> Unit) {
+        override fun <K : WatchList.Watchable> watches(gen: () -> K, block: (K) -> Unit) {
             if (isFirstLoop)
-                block(gen(watchList))
+                block(gen().also { watchList.add(it) })
         }
 
         private var tLast = timeSinceInit
         private var isFirstLoop = true
         fun updateAtEndOfLoop() {
-            dt = timeSinceInit - tLast
-            tLast = timeSinceInit
+            updateDT()
             isFirstLoop = false
             watchList.tick()
+        }
+        fun updateDT() {
+            dt = timeSinceInit - tLast
+            tLast = timeSinceInit
         }
 
         override var dt = 0.0

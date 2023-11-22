@@ -43,9 +43,7 @@ class Gamepad(
 
     class Button(isHeld: KProperty0<Boolean>) {
         val isHeld by isHeld
-        inner class Watch(
-                list: WatchList,
-        ): WatchList.Watchable {
+        inner class Watch(): WatchList.Watchable {
             private var wasHeld = isHeld
             var justPressed = false
                 private set
@@ -73,10 +71,6 @@ class Gamepad(
                     changedSender.send(isHeld)
                 }
                 wasHeld = isHeld
-            }
-
-            init {
-                list.add(this)
             }
         }
     }

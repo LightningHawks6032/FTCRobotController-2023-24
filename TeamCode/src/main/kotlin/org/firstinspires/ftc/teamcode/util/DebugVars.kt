@@ -33,10 +33,10 @@ suspend fun <T : Any> LOpMode<T>.RunScope.selectDebugInt(name: String, defaultVa
     var value = DebugVars.int[name] ?: defaultVal
     var incrementPlaceNumber = 0
     val changeWatchList = WatchList()
-    val dpadUp = gamepadA.dpad.up.Watch(changeWatchList)
-    val dpadDown = gamepadA.dpad.down.Watch(changeWatchList)
-    val dpadLeft = gamepadA.dpad.left.Watch(changeWatchList)
-    val dpadRight = gamepadA.dpad.right.Watch(changeWatchList)
+    val dpadUp = gamepadA.dpad.up.Watch().also { changeWatchList.add(it) }
+    val dpadDown = gamepadA.dpad.down.Watch().also { changeWatchList.add(it) }
+    val dpadLeft = gamepadA.dpad.left.Watch().also { changeWatchList.add(it) }
+    val dpadRight = gamepadA.dpad.right.Watch().also { changeWatchList.add(it) }
     while (!buttonAIsHeld) {
         changeWatchList.tick()
         if (dpadLeft.justPressed) incrementPlaceNumber++

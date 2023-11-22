@@ -46,7 +46,7 @@ class TestOp : LOpMode<RobotA.Impl>(RobotA.instance, {
     createLoop { robot.tick(dt) }
 
     createLoop {
-        watches({ gamepadA.dpad.up.Watch(it) }) {
+        watches(gamepadA.dpad.up::Watch) {
             it.pressed.bind {
                 robot.doThing()
             }
