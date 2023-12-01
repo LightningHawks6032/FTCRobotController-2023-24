@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.controlSystems
 
 import org.firstinspires.ftc.teamcode.controlSystems.motionPath.MotionPath
+import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
 import org.firstinspires.ftc.teamcode.hardware.motion.IDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.IOdometry
 import org.firstinspires.ftc.teamcode.util.NotForCompetition
@@ -24,6 +25,21 @@ class DriveController(
 
     var path: MotionPath<Vec2Rot>? = null
     var targetPos: Vec2Rot = input.pos
+
+    fun assertPosition(pos: Vec2Rot) {
+        input.assertPosition(pos)
+    }
+
+    fun writeTelemetry(t: WithTelemetry.Scope) {
+        t.ln("::: DRIVE CONTROLLER :::")
+        t.ln("pos.x: ${input.pos.v.x}")
+        t.ln("pos.y: ${input.pos.v.y}")
+        t.ln("pos.r: ${input.pos.r}")
+        t.ln("vel.x: ${input.vel.v.x}")
+        t.ln("vel.y: ${input.vel.v.y}")
+        t.ln("vel.r: ${input.vel.r}")
+        t.ln("::::::::::::::::::::::::")
+    }
 
     private val pid = PID(PIDCoefficients(
             0.50,

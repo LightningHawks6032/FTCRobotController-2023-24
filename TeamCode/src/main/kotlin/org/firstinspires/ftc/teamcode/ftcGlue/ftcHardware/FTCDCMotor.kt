@@ -11,6 +11,6 @@ class FTCDCMotor(private val dcMotor: DcMotor) : IDCMotor {
     init {
         // Always carry same config, so better config can be built on top.
         dcMotor.direction = DcMotorSimple.Direction.FORWARD
-        dcMotor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+        dcMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 }

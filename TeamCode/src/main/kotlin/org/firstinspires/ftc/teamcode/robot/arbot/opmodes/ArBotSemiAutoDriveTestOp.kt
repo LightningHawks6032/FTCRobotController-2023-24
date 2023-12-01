@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import kotlinx.coroutines.delay
 import org.firstinspires.ftc.teamcode.LOpMode
+import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
 import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.*
 import kotlin.math.PI
@@ -27,8 +28,18 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     val (odometry, drive) = robot.drive.debugTakeControl()
 
+    val withOdometryTelemetry = WithTelemetry.Partial()
     createLoop {
         odometry.tick(dt)
+        withOdometryTelemetry {
+            val r = odometry.pos.r
+            val (x, y) = odometry.pos.v
+            ln(":: ODOMETRY POS ::")
+            ln("x: $x")
+            ln("y: $y")
+            ln("r: $r")
+            ln("::::::::::::::::::")
+        }
     }
 
     if (DebugVars.bool[runOdometryNotDriveModeVarName] == true) {
@@ -39,7 +50,7 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
         aPressed.wait()
 
-        // FORWARD (+y)
+        // FORWARD (+x)
         withTelemetry {
             ln("Prepare to move the robot FORWARD precisely 12 inches.")
             ln("Make sure the robot is not moving, then press A.")
@@ -50,20 +61,20 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             ln("Move the robot 12 inches FORWARD, then press A.")
         }
         aPressed.wait()
-        val deltaPositiveY = odometry.pos
+        val deltaPositiveX = odometry.pos
 
-        // RIGHT (+x)
+        // LEFT (+y)
         withTelemetry {
-            ln("Prepare to move the robot RIGHT precisely 12 inches.")
+            ln("Prepare to move the robot LEFT precisely 12 inches.")
             ln("Make sure the robot is not moving, then press A.")
         }
         aPressed.wait()
         odometry.assertPosition(Vec2Rot.zero)
         withTelemetry {
-            ln("Move the robot 12 inches RIGHT, then press A.")
+            ln("Move the robot 12 inches LEFT, then press A.")
         }
         aPressed.wait()
-        val deltaPositiveX = odometry.pos
+        val deltaPositiveY = odometry.pos
 
         // CCW (+r)
         withTelemetry {
@@ -83,13 +94,13 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             ln("//// Odometry Test Results ////")
             ln()
 
-            ln("Expected (+x)", "${Vec2Rot(Vec2(1.0,0.0),0.0)}")
+            ln("Expected (+x)", "${Vec2Rot(Vec2(1.0, 0.0), 0.0)}")
             ln("Received", "${deltaPositiveX.transformP { it / 12.0 }}")
             ln()
-            ln("Expected (+y)", "${Vec2Rot(Vec2(0.0,1.0),0.0)}")
+            ln("Expected (+y)", "${Vec2Rot(Vec2(0.0, 1.0), 0.0)}")
             ln("Received", "${deltaPositiveY.transformP { it / 12.0 }}")
             ln()
-            ln("Expected (+r)", "${Vec2Rot(Vec2(0.0,0.0), 1.0)}")
+            ln("Expected (+r)", "${Vec2Rot(Vec2(0.0, 0.0), 1.0)}")
             ln("Received", "${deltaPositiveR / PI}")
 
             ln("")
@@ -109,11 +120,15 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             while (odometry.pos.let { it.v.magSq / 12.0.pow(2) + it.r.pow(2) / PI.pow(2) } < 1.0) {
                 power += 0.05 * 0.25 // ramp up to full in four seconds
                 drive.power = targetPower * power
+                withTelemetry {
+                    ln("Running...")
+                    +withOdometryTelemetry
+                }
                 delay(50) // 1/20 seconds
             }
         }
 
-        // FORWARD (+y)
+        // FORWARD (+x)
         withTelemetry {
             ln("The robot will now attempt to drive FORWARD.")
             ln("Make sure robot won't damage anything within about two feet, then press A to begin.")
@@ -123,12 +138,12 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             ln("Running...")
         }
         odometry.assertPosition(Vec2Rot.zero)
-        rampPower(Vec2Rot(Vec2(0.0,1.0),0.0))
-        val deltaPositiveY = odometry.pos
+        rampPower(Vec2Rot(Vec2(1.0, 0.0), 0.0))
+        val deltaPositiveX = odometry.pos
 
-        // RIGHT (+x)
+        // LEFT (+y)
         withTelemetry {
-            ln("The robot will now attempt to drive RIGHT.")
+            ln("The robot will now attempt to drive LEFT.")
             ln("Make sure robot won't damage anything within about two feet, then press A to begin.")
         }
         aPressed.wait()
@@ -136,8 +151,8 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             ln("Running...")
         }
         odometry.assertPosition(Vec2Rot.zero)
-        rampPower(Vec2Rot(Vec2(1.0,0.0),0.0))
-        val deltaPositiveX = odometry.pos
+        rampPower(Vec2Rot(Vec2(0.0, 1.0), 0.0))
+        val deltaPositiveY = odometry.pos
 
         // CCW (+r)
         withTelemetry {
@@ -149,20 +164,20 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             ln("Running...")
         }
         odometry.assertPosition(Vec2Rot.zero)
-        rampPower(Vec2Rot(Vec2.zero,1.0))
+        rampPower(Vec2Rot(Vec2.zero, 1.0))
         val deltaPositiveR = odometry.pos
 
         withTelemetry(printToConsole = true) {
             ln("//// Drive Test Results ////")
             ln()
 
-            ln("Expected (+x)", "${Vec2Rot(Vec2(1.0,0.0),0.0)}")
+            ln("Expected (+x)", "${Vec2Rot(Vec2(1.0, 0.0), 0.0)}")
             ln("Received", "${deltaPositiveX.transformP { it / 12.0 }}")
             ln()
-            ln("Expected (+y)", "${Vec2Rot(Vec2(0.0,1.0),0.0)}")
+            ln("Expected (+y)", "${Vec2Rot(Vec2(0.0, 1.0), 0.0)}")
             ln("Received", "${deltaPositiveY.transformP { it / 12.0 }}")
             ln()
-            ln("Expected (+r)", "${Vec2Rot(Vec2(0.0,0.0), 1.0)}")
+            ln("Expected (+r)", "${Vec2Rot(Vec2(0.0, 0.0), 1.0)}")
             ln("Received", "${deltaPositiveR / PI}")
 
             ln()

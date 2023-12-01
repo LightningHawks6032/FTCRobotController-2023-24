@@ -23,7 +23,7 @@ import kotlin.math.PI
 
 /**
 
- KEY: `CH[3]` &rarr; Control Hub Port 3, `EH[0]` &rarr; Expansion Hub Port 0
+KEY: `CH[3]` &rarr; Control Hub Port 3, `EH[0]` &rarr; Expansion Hub Port 0
 
 DCMotor Mappings:
 - "fr" (`CH[2]`): front right drive motor, front odometry wheel
@@ -55,15 +55,14 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             ),
     )
     private val threeWheelOdometry = ThreeWheelOdometry(
-            Vec2Rot((Vec2(-45.18,-27.17) * MM_TO_IN), 0.0),
+            Vec2Rot((Vec2(-45.18, -27.17) * MM_TO_IN), 0.0),
             yReaderPos = (+196 + 45.18) * MM_TO_IN,
             x0ReaderPos = (+196.0 + 27.17) * MM_TO_IN,
             x1ReaderPos = (-196.0 + 27.17) * MM_TO_IN,
             Motor.PhysicalSpec.GOBILDA_ODOMETRY_POD,
             48.0 * MM_TO_IN,
-            ThreeWheelOdometry.ReversalPattern( // 115
-                    // TODO
-                    y = false,
+            ThreeWheelOdometry.ReversalPattern(
+                    y = true,
                     x0 = false,
                     x1 = true,
             ),
