@@ -8,8 +8,9 @@ import org.firstinspires.ftc.teamcode.util.*
 import kotlin.math.PI
 import kotlin.math.pow
 
-@TeleOp
+
 @NotForCompetition
+@TeleOp
 class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val runOdometryNotDriveModeVarName = "mode: odometry (true), drive (false)"
     selectDebugBool(runOdometryNotDriveModeVarName)

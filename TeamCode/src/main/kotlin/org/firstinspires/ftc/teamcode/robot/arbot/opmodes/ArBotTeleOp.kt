@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
+import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
 import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.*
 import kotlin.math.PI
 
-@OptIn(NotForCompetition::class)
+@NotForCompetition
 @TeleOp
 class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val intakeArmAtOuttakeDropOff = PI/6
@@ -17,13 +18,12 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val switchControlScheme = DebugVars.bool["switch_control_scheme"] ?: false
 
     withTelemetry {
-        ln("ok")
+        ln("initialized, waiting for start")
     }
     waitForStart()
 
-    withTelemetry {
-        ln("started")
-    }
+    val withDriveStatus = WithTelemetry.Partial()
+    val withControlStatus = WithTelemetry.Partial()
 
     createLoop {
         val slowA = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
@@ -35,16 +35,10 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         // ---------- INTAKE ----------- //
         /// Intake velocity (positive -> towards outtake)
         val intakeV = gamepadB.stick.left.pos.x * slowMultiplierB
-        var intakeX by robot.intake.controller::targetPosition
+        var intakeX by robot.intake.angleController::targetPosition
         intakeX = (intakeX + dt * intakeV).clamp(-PI/2, intakeArmAtOuttakeDropOff)
-        watches(gamepadB.a::Watch) { it.pressed.bind {
-            robot.intake.inputServosOpen = !robot.intake.inputServosOpen
-        } }
-        watches(gamepadB.b::Watch) { it.pressed.bind {
-            robot.intake.transferServosOpen = !robot.intake.transferServosOpen
-        } }
 //        robot.intake.tick(dt)
-        robot.intake.arm.power = intakeV
+        robot.intake.debugAnglePower = intakeV
 
         // ---------- OUTTAKE ---------- //
         /// Outtake velocity (positive -> up)
@@ -56,29 +50,68 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         var outtakeX by robot.outtake.controller::targetPosition
         outtakeX = (outtakeX + dt * outtakeV).clamp(-1.0, outtakeArmMaxHeight)
         watches(gamepadB.x::Watch) { it.pressed.bind {
-            robot.outtake.outputServosOpen = !robot.outtake.outputServosOpen
+            robot.outtake.outtakeTilt = !robot.outtake.outtakeTilt
         } }
+        // Force-close the outtake box under a certain point to avoid damage.
+        // (if expected position 0.5 seconds in the future is less than 10in)
+        if (outtakeX + outtakeV * 0.5 < 10.0) {
+            robot.outtake.outtakeTilt = false
+        }
+        robot.outtake.dropOpen = gamepadB.a.isHeld
 //        robot.outtake.tick(dt)
-        robot.outtake.lifter.power = outtakeV
+        robot.outtake.debugLifterPower = outtakeV
 
-        withTelemetry {
+        withControlStatus {
             ln("i", intakeX)
             ln("o", outtakeX)
         }
     }
 
-    val (_odometry, drive) = robot.drive.debugTakeControl()
+    val (odometry, drive) = robot.drive.debugTakeControl()
 
     createLoop {
         /// drive
         val slow = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
         val slowMultiplier = if (slow) 0.25 else 0.5
 
-        drive.power = (Vec2Rot(
-                v = gamepadA.stick.left.pos.let { Vec2(it.y, it.x) },
-                r = gamepadA.stick.right.pos.x,
-        ) * slowMultiplier)
+        if (switchControlScheme) {
+            // triggers to strafe
+            drive.power = (Vec2Rot(
+                    x = gamepadA.stick.left.pos.y,
+                    y = gamepadA.trigger.let { it.right - it.left },
+                    r = gamepadA.stick.right.pos.x,
+            ) * slowMultiplier)
+        } else {
+            // single stick linear motion
+            drive.power = (Vec2Rot(
+                    v = gamepadA.stick.left.pos.let { Vec2(it.y, it.x) },
+                    r = gamepadA.stick.right.pos.x,
+            ) * slowMultiplier)
+        }
 //        robot.drive.tick(dt)
+
+        /// odometry
+
+        odometry.tick(dt)
+        withDriveStatus {
+            ln("pos")
+            ln("x", "${odometry.pos.v.x} in")
+            ln("y", "${odometry.pos.v.y} in")
+            ln("r", "${odometry.pos.r} rad")
+            ln()
+            ln("vel")
+            ln("x", "${odometry.vel.v.x} in/s")
+            ln("y", "${odometry.vel.v.y} in/s")
+            ln("r", "${odometry.vel.r} rad/s")
+        }
+    }
+
+    createLoop {
+        withTelemetry {
+            + withControlStatus
+            ln("------------------")
+            + withDriveStatus
+        }
     }
 
 })

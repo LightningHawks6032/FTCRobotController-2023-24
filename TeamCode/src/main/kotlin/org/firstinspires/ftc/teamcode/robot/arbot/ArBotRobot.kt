@@ -27,22 +27,19 @@ import kotlin.math.PI
 
 DCMotor Mappings:
 - "fr" (`CH[2]`): front right drive motor, front odometry wheel
-- "fl" (`CH[3]`): front left drive motor
+- "fl" (`CH[3]`): front left drive motor, left odometry wheel
 - "br" (`CH[1]`): back right drive motor, right odometry wheel
-- "bl" (`CH[0]`): back left drive motor, left odometry wheel
+- "bl" (`CH[0]`): back left drive motor
 
-- "ar": (`EH[0]`) right intake arm motor
-- "al": (`EH[1]`) left intake arm motor
+- "a": (`EH[0]`) intake arm angle motor
+- "s": (`EH[1]`) intake high speed spinner motor
 
 - "l0": (`EH[2]`) out take lifter linear slide motor
 - "l1": (`EH[3]`) out take lifter linear slide motor (the other one)
 
 Servo Mappings:
-- "ir" (`CH[0]`): intake input servo, right
-- "il" (`CH[1]`): intake input servo, left
-- "tr" (`CH[2]`): intake transfer/mid-take servo
-- "or" (`CH[4]`): outtake dropper servo, right
-- "ol" (`CH[5]`): outtake dropper servo, left
+- "t" (`CH[0]`): outtake tilt angle servo
+- "d" (`CH[1]`): outtake drop servo
 
  */
 object ArBotRobot : IRobot<ArBotRobot.Impl> {
@@ -58,19 +55,19 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             ),
     )
     private val threeWheelOdometry = ThreeWheelOdometry(
-            Vec2Rot((Vec2(6.0 - 115.0, -2.0) * MM_TO_IN).rotate(PI / 2), PI / 2), // yReaderPos is in front
-            yReaderPos = (179.0 + 115.0) * MM_TO_IN,
-            x0ReaderPos = 94.0 * MM_TO_IN,
-            x1ReaderPos = -98.0 * MM_TO_IN,
+            Vec2Rot((Vec2(-45.18,-27.17) * MM_TO_IN), 0.0),
+            yReaderPos = (+196 + 45.18) * MM_TO_IN,
+            x0ReaderPos = (+196.0 + 27.17) * MM_TO_IN,
+            x1ReaderPos = (-196.0 + 27.17) * MM_TO_IN,
             Motor.PhysicalSpec.GOBILDA_ODOMETRY_POD,
-            1.75 / 2.0,
+            48.0 * MM_TO_IN,
             ThreeWheelOdometry.ReversalPattern( // 115
                     // TODO
                     y = false,
                     x0 = false,
                     x1 = true,
             ),
-            ThreeWheelOdometry.Ids(mecanum.ids.fr, mecanum.ids.bl, mecanum.ids.br),
+            ThreeWheelOdometry.Ids(mecanum.ids.fr, mecanum.ids.fl, mecanum.ids.br),
     )
 
     private val aprilTagTracking = AprilTagTracking(

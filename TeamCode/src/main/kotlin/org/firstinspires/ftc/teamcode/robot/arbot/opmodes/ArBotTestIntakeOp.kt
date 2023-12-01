@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
+import org.firstinspires.ftc.teamcode.util.NotForCompetition
 
+@NotForCompetition
 @TeleOp
 class ArBotTestIntakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     robot.intake.pos = 0.0
@@ -13,18 +15,15 @@ class ArBotTestIntakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     createLoop {
         robot.intake.tick(dt)
 
-        val x = gamepadA.stick.left.pos.x
-        robot.intake.controller.targetPosition = x
+        val target = gamepadA.stick.left.pos.x
+        robot.intake.angleController.targetPosition = target
 
-        val a = gamepadA.a.isHeld
-        robot.intake.inputServosOpen = !a
-        val b = gamepadA.b.isHeld
-        robot.intake.transferServosOpen = !b
+        val spinPower = gamepadA.stick.right.pos.x
+        robot.intake.spinPower = spinPower
 
         withTelemetry {
-            ln("intake target rotation (radians)", x)
-            ln("input servos open", !a)
-            ln("transfer servos open", !b)
+            ln("intake target rotation (radians)", target)
+            ln("intake spinner power", spinPower)
         }
     }
 

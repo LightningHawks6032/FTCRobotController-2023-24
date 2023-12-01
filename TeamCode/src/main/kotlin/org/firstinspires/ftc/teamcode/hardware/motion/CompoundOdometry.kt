@@ -48,14 +48,18 @@ class CompoundOdometry(
 
         // Pos is the sum, (*2 to account for dampening)
         // I didn't do the math for this but it works in the simulations.
+        // ^^^^ this is probably wrong
+
         val lastVel = vel
-        pos = (yHi + yLo) * 2.0
+        pos = yHi + yLo
         vel = (pos - lastPos) / dt
         acc = (vel - lastVel) / dt
 
         // Update the hiPassOdo's general position so it doesn't get to reporting positions based
         // on unreliable assumptions.
-        hiPassOdo.nudge(pos)
+        if (loPassOdo.hasPositionInfo()) {
+            hiPassOdo.nudge(pos)
+        }
     }
 
     override fun assertPosition(newPos: Vec2Rot) {

@@ -18,16 +18,15 @@ class ArBotOuttake(
             Motor("l0", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config { reversed = doReverse }),
             Motor("l1", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config { reversed = doReverse.not() }),
     )
-    private val outputServosRef = TandemGroup.Servo(
-            Servo("or", continuousRotation = false, Servo.Config { reversed = false }), // TODO
-            Servo("ol", continuousRotation = false, Servo.Config { reversed = true }),
-    )
+    private val tiltServoRef = Servo("t", continuousRotation = false, Servo.Config { reversed = false })
+    private val dropServoRef = Servo("d", continuousRotation = false, Servo.Config { reversed = true })
 
-    private var outputServosOpen = false
+    private var outtakeTilt = false
 
     inner class Impl(hardwareMap: IHardwareMap) {
-         val lifter = lifterRef.Impl(hardwareMap)
-        private val outputServos = outputServosRef.Impl(hardwareMap)
+        private val lifter = lifterRef.Impl(hardwareMap)
+        private val tiltServo = tiltServoRef.Impl(hardwareMap)
+        private val dropServo = dropServoRef.Impl(hardwareMap)
 
         private fun onEditZeroPos(it: ()->Unit) {
             controller.posZeroPointEdit(it)
@@ -41,15 +40,23 @@ class ArBotOuttake(
         val controller = ActuatorPositionController(pidCoefficients, this::power, this::pos)
         fun tick(dt: Double) = controller.tick(dt)
 
-        var outputServosOpen by this@ArBotOuttake::outputServosOpen.delegate().withAfterWriteEffect { open ->
-            outputServos.pos = if (open) 0.0 else 1.0
+        var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
+            tiltServo.pos = if (open) 0.0 else 1.0
+        }
+        var dropOpen by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
+            dropServo.pos = if (open) 0.0 else 1.0
         }
         @NotForCompetition
-        fun debugControlOutputServos() = outputServos
+        fun debugControlTiltServo() = tiltServo
+        @NotForCompetition
+        fun debugControlDropServo() = dropServo
+        @NotForCompetition
+        var debugLifterPower by lifter::power
 
         init {
-            // update servo positions
-            outputServosOpen = this@ArBotOuttake.outputServosOpen
+            // reset servo positions
+            outtakeTilt = this@ArBotOuttake.outtakeTilt
+            dropOpen = false
         }
     }
 }
