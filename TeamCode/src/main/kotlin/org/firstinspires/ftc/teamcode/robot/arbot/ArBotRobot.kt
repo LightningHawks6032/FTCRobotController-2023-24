@@ -46,7 +46,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     private val mecanum = MecanumDrive(
             Vec2Rot.zero,
             Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
-            MecanumDrive.ReversalPattern(right = true),
+            MecanumDrive.ReversalPattern(left = true),
             MecanumDrive.Ids(
                     fr = "fr", // front-right motor
                     fl = "fl", // front-left motor
@@ -122,7 +122,14 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
 
         val drive = run {
             threeWheelOdometry.Impl(hardwareMap)
-            DriveController(mecanum.Impl(hardwareMap), odometry)
+            DriveController(mecanum.Impl(hardwareMap), odometry, PID1D.Coefficients(
+                    P = 0.5,
+                    I = 0.5,
+                    D = 0.5,
+                    iDecay = 4.0,
+                    bias = 0.05,
+                    biasSlope = 0.5,
+            ))
         }
 
         val intake = intakeRef.Impl(hardwareMap)

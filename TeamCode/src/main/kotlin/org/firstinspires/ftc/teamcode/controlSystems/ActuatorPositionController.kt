@@ -24,7 +24,8 @@ class ActuatorPositionController(
         targetPosition = targetPositionRel + pos
     }
 
-    private val pid = PID1D(pidCoefficients)
+//    private val pid = PID1D(pidCoefficients)
+    private val pid = QLearningAutoPIDAgent(pidCoefficients)
 
     var path: MotionPath<Double>? = null
     var targetPosition = pos

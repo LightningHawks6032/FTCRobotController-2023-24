@@ -41,9 +41,9 @@ class ArBotTestDriveOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 //                r = gamepadA.stick.right.pos.x,
 //        ) * speed)
         drive.power = (Vec2Rot(
-                x = gamepadA.stick.left.pos.y,
-                y = gamepadA.trigger.let { it.right - it.left },
-                r = gamepadA.stick.right.pos.x,
+                x = -gamepadA.stick.left.pos.y,
+                y = gamepadA.trigger.let { it.left - it.right },
+                r = -gamepadA.stick.right.pos.x,
         ) * speed)
         odometry.tick(dt)
 

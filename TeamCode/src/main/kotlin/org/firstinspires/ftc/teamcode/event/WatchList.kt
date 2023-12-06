@@ -5,7 +5,6 @@ class WatchList(
 ) : MutableSet<WatchList.Watchable> by list {
 
     fun tick() {
-    println("OTick ${this.size}")
     forEach { it.tick() }
     }
 

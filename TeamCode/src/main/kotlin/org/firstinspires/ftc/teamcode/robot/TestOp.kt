@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import kotlinx.coroutines.delay
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.controlSystems.DriveController
+import org.firstinspires.ftc.teamcode.controlSystems.PID1D
 import org.firstinspires.ftc.teamcode.controlSystems.motionPath.MotionPath
 import org.firstinspires.ftc.teamcode.controlSystems.motionPath.buildPath
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
@@ -126,7 +127,8 @@ class RobotA : IRobot<RobotA.Impl> {
         private val odo = this@RobotA.dbgOdo.also { it.drive = driveDrive }
         private val drive = DriveController(
                 driveDrive,
-                odo
+                odo,
+                PID1D.Coefficients(0.5,0.5,0.5,4.0,0.0,0.0)
         )
 //        private val encoder = this@RobotA.encoder.Impl(hardwareMap)
 

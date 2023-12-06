@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.controlSystems
 import kotlin.math.exp
 import kotlin.math.tanh
 
-class PID1D(private val coefficients: Coefficients) {
+class PID1D(val coefficients: Coefficients) {
     private var xOffAccumulation = 0.0
 
     fun tick(
@@ -23,7 +23,7 @@ class PID1D(private val coefficients: Coefficients) {
 
 
     data class Coefficients(
-            val P: Double, val I: Double, val D: Double,
+            var P: Double, var I: Double, var D: Double,
             val iDecay: Double,
             val biasSlope: Double,
             val bias: Double,

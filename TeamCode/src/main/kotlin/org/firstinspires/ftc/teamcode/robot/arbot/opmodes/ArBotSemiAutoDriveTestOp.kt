@@ -126,6 +126,7 @@ class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 }
                 delay(50) // 1/20 seconds
             }
+            drive.power = Vec2Rot.zero
         }
 
         // FORWARD (+x)

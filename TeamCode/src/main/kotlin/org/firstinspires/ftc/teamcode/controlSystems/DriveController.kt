@@ -8,19 +8,20 @@ import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import kotlin.math.abs
 import kotlin.math.max
-import kotlin.math.pow
 
 const val MAX_POW = 0.70710678118 // sqrt(1/2)
 
 class DriveController(
         private val output: IDrive,
         private val input: IOdometry,
+        control_pid_init: PID1D.Coefficients,
 ) {
     @NotForCompetition
     fun debugTakeControl(): Pair<IOdometry, IDrive> {
         disableTicking = true
         return Pair(input, output)
     }
+
     private var disableTicking = false
 
     var path: MotionPath<Vec2Rot>? = null
@@ -41,13 +42,7 @@ class DriveController(
         t.ln("::::::::::::::::::::::::")
     }
 
-    private val pid = PID(PIDCoefficients(
-            0.50,
-            1.50,
-            1.00,
-            0.5,
-    ))
-    var pidCoefficients by pid::coefficients
+    private val pid = Control(control_pid_init)
 
     var t = 0.0
     fun tick(dt: Double) {
@@ -74,29 +69,20 @@ class DriveController(
         output.power = Vec2Rot.zero
     }
 
-    class PID(
-            var coefficients: PIDCoefficients
-    ) {
-        private var iValue = Vec2Rot.zero
+    class Control(init_coefficients: PID1D.Coefficients) {
+        private val controlX = QLearningAutoPIDAgent(init_coefficients)
+        private val controlY = QLearningAutoPIDAgent(init_coefficients)
+        private val controlR = QLearningAutoPIDAgent(init_coefficients)
         fun tick(
                 xp: Vec2Rot, xd: Vec2Rot,
                 tp: Vec2Rot, td: Vec2Rot,
                 dt: Double,
         ): Vec2Rot {
-            val pValue = tp - xp
-            val dValue = td - xd
-            iValue += pValue * dt
-            iValue *= coefficients.iValueDecay.pow(dt)
-
-            println("p : $pValue  d : $dValue  i : $iValue")
-
-            return (pValue * coefficients.p + iValue * coefficients.i + dValue * coefficients.d)
+            return Vec2Rot(
+                    controlX.tick(xp.v.x, xd.v.x, tp.v.x, td.v.x, dt),
+                    controlY.tick(xp.v.y, xd.v.y, tp.v.y, td.v.y, dt),
+                    controlR.tick(xp.r, xd.r, tp.r, td.r, dt),
+            )
         }
     }
-    data class PIDCoefficients(
-            val i: Double,
-            val p: Double,
-            val d: Double,
-            val iValueDecay: Double,
-    )
 }
