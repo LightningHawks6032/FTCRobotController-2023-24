@@ -40,6 +40,13 @@ operator fun WDelegate<Double>.times(fac: ()->Double) =
                 toOuter = { it * fac() },
                 toInner = { it / fac() }
         )
+
+data class DelegateRange(val negVal: Double, val posVal: Double)
+fun WDelegate<Double>.remapRange(rangeInner: DelegateRange, rangeOuter: DelegateRange): WDelegate<Double> =
+        transform(
+                toOuter = { ((it - rangeInner.negVal) / (rangeInner.posVal - rangeInner.negVal)) * (rangeOuter.posVal - rangeOuter.negVal) + rangeOuter.negVal },
+                toInner = { ((it - rangeOuter.negVal) / (rangeOuter.posVal - rangeOuter.negVal)) * (rangeInner.posVal - rangeInner.negVal) + rangeInner.negVal }
+        )
 operator fun WDelegate<Double>.plus(fac: ()->Double) =
         transform(
                 toOuter = { it + fac() },

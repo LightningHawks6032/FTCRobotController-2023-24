@@ -12,6 +12,8 @@ private const val IN_PER_RAD_OUTTAKE_SLIDES = 1.0 // TODO
 
 class ArBotOuttake(
         doReverse: Boolean = false,
+        private val tiltServoRange: DelegateRange,
+        private val dropServoRange: DelegateRange,
         private val pidCoefficients: PID1D.Coefficients,
 ) {
     private val lifterRef = TandemGroup.Motor(
@@ -40,11 +42,13 @@ class ArBotOuttake(
         val controller = ActuatorPositionController(pidCoefficients, this::power, this::pos)
         fun tick(dt: Double) = controller.tick(dt)
 
-        var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
-            tiltServo.pos = if (open) 0.0 else 1.0
+        private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
+        private var dropServoPos by dropServo::pos.delegate().remapRange(dropServoRange, DelegateRange(-1.0,1.0))
+        var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { tilt ->
+            tiltServoPos = if (tilt) 1.0 else -1.0
         }
         var dropOpen by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
-            dropServo.pos = if (open) 0.0 else 1.0
+            dropServoPos = if (open) 1.0 else -1.0
         }
         @NotForCompetition
         fun debugControlTiltServo() = tiltServo

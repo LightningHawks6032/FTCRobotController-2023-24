@@ -11,10 +11,7 @@ import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.ThreeWheelOdometry
 import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotIntake
 import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotOuttake
-import org.firstinspires.ftc.teamcode.util.MM_TO_IN
-import org.firstinspires.ftc.teamcode.util.Vec2
-import org.firstinspires.ftc.teamcode.util.Vec2Rot
-import org.firstinspires.ftc.teamcode.util.Vec3
+import org.firstinspires.ftc.teamcode.util.*
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagInfoBuilder
 import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagTracking
@@ -102,6 +99,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     )
     private val outtakeRef = ArBotOuttake(
             false,
+            tiltServoRange = DelegateRange(-1.0, 1.0), // TODO tiltServoRange
+            dropServoRange = DelegateRange(-0.5, 0.0),
             PID1D.Coefficients(
                     P = 1.0,
                     I = 0.2,
