@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.hardware.motion
 
+import androidx.core.math.MathUtils
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.util.Transform2D
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
+import kotlin.math.min
 
 class MecanumDrive(
         assemblyLocationRobotSpace: Vec2Rot,
@@ -51,8 +53,8 @@ class MecanumDrive(
             set(newPower) {
                 field = newPower
                 val localSpacePower = assembly2robotTransform.transformVelInv(newPower)
-                val (_,r) = localSpacePower
-                val (x,y) = localSpacePower.v
+                val r = MathUtils.clamp(localSpacePower.r, -1.0, 1.0)
+                val (x,y) = localSpacePower.v.norm * min(1.0, localSpacePower.v.mag)
 
                 fr.power = x + y + r
                 fl.power = x - y - r

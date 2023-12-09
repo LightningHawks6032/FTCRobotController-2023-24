@@ -46,5 +46,6 @@ class ActuatorPositionController(
                 target.pos, target.vel,
                 dt
         ).clamp(-1.0, 1.0)
+        println("TP: ${target.pos}, $power")
     }
 }

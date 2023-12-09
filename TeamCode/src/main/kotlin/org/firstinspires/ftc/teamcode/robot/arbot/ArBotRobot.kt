@@ -93,8 +93,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
                     I = 0.2,
                     D = 0.5,
                     iDecay = 4.0,
-                    biasSlope = 10.0,
-                    bias = 0.2,
+                    biasSlope = 0.0,
+                    bias = 0.0,
             )
     )
     private val outtakeRef = ArBotOuttake(
@@ -106,8 +106,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
                     I = 0.2,
                     D = 0.5,
                     iDecay = 4.0,
-                    biasSlope = 10.0,
-                    bias = 0.2,
+                    biasSlope = 0.0,
+                    bias = 0.0,
             )
     )
 

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import kotlinx.coroutines.delay
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
+import org.firstinspires.ftc.teamcode.robot.OpGroupName
 import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.*
 import kotlin.math.PI
@@ -11,7 +12,7 @@ import kotlin.math.pow
 
 
 @NotForCompetition
-@TeleOp
+@TeleOp(name = "SemiAutoDriveTest", group = OpGroupName.DEBUGGING)
 class ArBotSemiAutoDriveTestOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val runOdometryNotDriveModeVarName = "mode: odometry (true), drive (false)"
     selectDebugBool(runOdometryNotDriveModeVarName)

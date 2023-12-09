@@ -56,12 +56,21 @@ class ThreeWheelOdometry(
 
 
     override fun tick(dt: Double) {
-        val delta = currentImpl?.readDelta(dt)
-        val robot2world = robot2worldTransform()
+        val delta = currentImpl?.readDelta() ?: run {
+            println("attempted to tick odometry without initializing hardware")
+            return
+        }
 
         val prevVel = vel
-        vel = robot2world.transformVelFwd(delta?.vel ?: Vec2Rot.zero)
-        pos += robot2world.transformVelFwd(delta?.dPos ?: Vec2Rot.zero)
+        val prevPos = pos
+        val count = 50
+        // rotation makes things weird, approximate the behavior of spinning and translating
+        // at the same time by just adding a little bit at a time, calculus style.
+        for (iteration in 0 until count) {
+            val miniDelta = delta / count.toDouble()
+            pos += robot2worldTransform().transformVelFwd(miniDelta)
+        }
+        vel = (pos - prevPos) / dt
         acc = (vel - prevVel) / dt
     }
 
@@ -94,10 +103,10 @@ class ThreeWheelOdometry(
         }
 
         /** Get the estimated change in position in robot local space. */
-        fun readDelta(dt: Double): Delta {
-            val deltaX0 = deltaX0
-            val deltaX1 = deltaX1
-            val deltaYR = deltaY
+        fun readDelta(): Vec2Rot {
+            var deltaX0 = deltaX0 * wheelRadiiInches
+            var deltaX1 = deltaX1 * wheelRadiiInches
+            var deltaYR = deltaY * wheelRadiiInches
 
             // vx0 = -vr * x0p + vx ; vr = (vx - vx0) / x0p ; vx = vx0 + vr * x0p
             // vx1 = -vr * x1p + vx ; vr = (vx - vx1) / x1p ; vx = vx1 + vr * x1p
@@ -114,12 +123,15 @@ class ThreeWheelOdometry(
             //
 
             val deltaR = (deltaX0 - deltaX1) / (x1ReaderPos - x0ReaderPos)
-            val deltaX = (deltaX0 * x1ReaderPos - deltaX1 * x0ReaderPos) / (x1ReaderPos - x0ReaderPos)
-            val deltaY = deltaYR - yReaderPos * deltaR
-            val deltaPos = assembly2robotTransform.transformVelFwd(
+            deltaX0 += x0ReaderPos * deltaR
+            deltaX1 += x1ReaderPos * deltaR
+            deltaYR += -yReaderPos * deltaR
+
+            val deltaX = (deltaX0 + deltaX1) / 2
+            val deltaY = deltaYR
+            return assembly2robotTransform.transformVelFwd(
                     Vec2Rot(deltaX, deltaY, deltaR)
             )
-            return Delta(deltaPos, dt)
         }
     }
 }

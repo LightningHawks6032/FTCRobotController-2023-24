@@ -39,6 +39,10 @@ class DriveController(
         t.ln("vel.x: ${input.vel.v.x}")
         t.ln("vel.y: ${input.vel.v.y}")
         t.ln("vel.r: ${input.vel.r}")
+        t.ln("------------------------")
+        t.ln("target.x: ${targetPos.v.x}")
+        t.ln("target.y: ${targetPos.v.y}")
+        t.ln("target.r: ${targetPos.r}")
         t.ln("::::::::::::::::::::::::")
     }
 

@@ -2,11 +2,12 @@ package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
+import org.firstinspires.ftc.teamcode.robot.OpGroupName
 import org.firstinspires.ftc.teamcode.robot.arbot.ArBotRobot
 import org.firstinspires.ftc.teamcode.util.NotForCompetition
 
 @NotForCompetition
-@TeleOp
+@TeleOp(name = "ServoTester", group = OpGroupName.DEBUGGING)
 class ArBotServoTesterOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     withTelemetry {
         ln("HBot servo tester")

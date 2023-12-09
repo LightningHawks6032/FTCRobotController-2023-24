@@ -44,7 +44,7 @@ private fun getState(x: Double, v: Double, tx: Double, tv: Double, force: Double
 /** PID controller auto-tuned live by a simple AI. */
 class QLearningAutoPIDAgent(init_coefficients: PID1D.Coefficients = PID1D.Coefficients(0.5, 0.5, 0.5, 0.5, 0.0, 0.0)) {
     private val pid = PID1D(init_coefficients)
-    fun tick(x:Double,tx: Double, v: Double,tv: Double,dt: Double): Double {
+    fun tick(x:Double, v: Double,tx: Double, tv: Double,dt: Double): Double {
         val power = pid.tick(x, v, tx, tv, dt)
         val state = getState(x, v, tx, tv, power)
         val scale = 1.0
@@ -57,6 +57,8 @@ class QLearningAutoPIDAgent(init_coefficients: PID1D.Coefficients = PID1D.Coeffi
             5 -> pid.coefficients.D += 1.0 * dt * scale // Increase KD
             6 -> pid.coefficients.D -= 1.0 * dt * scale // Decrease KD
         }
-        return power
+        println("PID: ${pid.coefficients.P} ${pid.coefficients.I} ${pid.coefficients.D}")
+        println("POWER $power")
+        return power * 0.5
     }
 }

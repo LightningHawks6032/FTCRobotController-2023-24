@@ -21,6 +21,11 @@ data class Vec2(
 
     val magSq get() = this dot this
     val mag get() = sqrt(magSq)
+    val norm get() = if (magSq < 1e-10) {
+        zero
+    } else {
+        this / mag
+    }
 
     /**
      * Return a rotated `Vec2`.

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware
 
 import com.qualcomm.robotcore.util.RobotLog
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
+import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.conditionallyAllowWriting
 import org.firstinspires.ftc.teamcode.util.delegate
 import org.firstinspires.ftc.teamcode.util.times
@@ -32,6 +33,10 @@ class Motor(
         }
     }
 
+    companion object {
+        @NotForCompetition
+        const val DEBUG_ENCODER_RESOLUTION = 1000.0
+    }
     enum class PhysicalSpec(
             /**
              * Motor encoder resolution in `ticks / rev`.
@@ -45,7 +50,9 @@ class Motor(
         GOBILDA_5202_0002_0005(145.1),
         GOBILDA_5202_0002_0003(103.8),
         GOBILDA_ODOMETRY_POD(2000.0, encoderOnly = true),
-        REV_THROUGH_BORE_ENCODER(8192.0, encoderOnly = true);
+        REV_THROUGH_BORE_ENCODER(8192.0, encoderOnly = true),
+        @NotForCompetition
+        DEBUG(DEBUG_ENCODER_RESOLUTION);
 
         /** Motor encoder resolution in `rad / tick`.*/
         val encoderRadPerTick = (2 * Math.PI) / encoderResolutionPPR // (2pi rad / 1 rev) * (rev / tick)
