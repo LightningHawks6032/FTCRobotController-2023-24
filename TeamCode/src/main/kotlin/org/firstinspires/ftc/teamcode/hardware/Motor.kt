@@ -2,10 +2,7 @@ package org.firstinspires.ftc.teamcode.hardware
 
 import com.qualcomm.robotcore.util.RobotLog
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
-import org.firstinspires.ftc.teamcode.util.NotForCompetition
-import org.firstinspires.ftc.teamcode.util.conditionallyAllowWriting
-import org.firstinspires.ftc.teamcode.util.delegate
-import org.firstinspires.ftc.teamcode.util.times
+import org.firstinspires.ftc.teamcode.util.*
 
 class Motor(
         private val id: String,
@@ -37,6 +34,7 @@ class Motor(
         @NotForCompetition
         const val DEBUG_ENCODER_RESOLUTION = 1000.0
     }
+
     enum class PhysicalSpec(
             /**
              * Motor encoder resolution in `ticks / rev`.
@@ -44,18 +42,31 @@ class Motor(
              */
             encoderResolutionPPR: Double,
 
+            /** Speed of the motor without anything on it's output shaft at 12 volts (motor.power = 1.0). (in RPM) */
+            noLoadSpeedRPM: Double,
+            /** Torque of the motor at which point is stops moving at 12 volts (motor.power = 1.0). (in Kg-cm) */
+            stallTorqueKgCM: Double,
+
             /** Marks this spec as only containing an encoder. */
             val encoderOnly: Boolean = false,
     ) {
-        GOBILDA_5202_0002_0005(145.1),
-        GOBILDA_5202_0002_0003(103.8),
-        GOBILDA_ODOMETRY_POD(2000.0, encoderOnly = true),
-        REV_THROUGH_BORE_ENCODER(8192.0, encoderOnly = true),
+        GOBILDA_5202_0002_0001(28.0, 6000.0, 1.5),
+        GOBILDA_5202_0002_0003(103.8, 1620.0, 5.4),
+        GOBILDA_5202_0002_0005(145.1, 1150.0, 7.9),
+        GOBILDA_ODOMETRY_POD(2000.0, 0.0, 0.0, encoderOnly = true),
+        REV_THROUGH_BORE_ENCODER(8192.0, 0.0, 0.0, encoderOnly = true),
+
         @NotForCompetition
-        DEBUG(DEBUG_ENCODER_RESOLUTION);
+        DEBUG(DEBUG_ENCODER_RESOLUTION, 0.0, 0.0);
 
         /** Motor encoder resolution in `rad / tick`.*/
         val encoderRadPerTick = (2 * Math.PI) / encoderResolutionPPR // (2pi rad / 1 rev) * (rev / tick)
+
+        /** Speed of the motor without anything on it's output shaft at 12 volts (motor.power = 1.0). (in rad / s) */
+        val noLoadSpeedRadPerSec = (2 * Math.PI) * noLoadSpeedRPM / 60 // (2pi rad / 1 rev) / (60 sec / 1 min)
+
+        /** Torque of the motor at which point is stops moving at 12 volts (motor.power = 1.0). (in Newton-cm) */
+        val stallTorqueNCM = 9.80665 * stallTorqueKgCM
     }
 
     inner class Impl(hardwareMap: IHardwareMap) {
@@ -68,6 +79,12 @@ class Motor(
                                 allowedWhen = this@Motor::useMotor.delegate()
                         ).times { reverseConst }
                 )
+
+        fun setTorque(torqueNCM: Double, currentVel: Double) {
+            power = (
+                    torqueNCM / motorSpec.stallTorqueNCM + currentVel / motorSpec.noLoadSpeedRadPerSec
+                    ).clamp(-1.0, 1.0)
+        }
 
         private val scaledPosRaw get() = idcMotor.pos * motorSpec.encoderRadPerTick
         var pos

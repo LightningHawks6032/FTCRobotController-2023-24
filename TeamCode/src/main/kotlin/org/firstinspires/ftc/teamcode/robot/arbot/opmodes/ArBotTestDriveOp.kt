@@ -48,6 +48,10 @@ class ArBotTestDriveOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         ) * speed)
         odometry.tick(dt)
 
+        if (gamepadA.x.isHeld) {
+            odometry.assertPosition(Vec2Rot.zero)
+        }
+
         withTelemetry {
             ln("-- drive power -----------")
             ln("x: ${drive.power.v.x}")

@@ -76,6 +76,12 @@ data class Vec2Rot(
     operator fun div(other: Double) = this * (1.0 / other)
     inline fun transformP(block: (Vec2) -> Vec2) = Vec2Rot(block(v), r)
 
+    infix fun componentwiseTimes(other: Vec2Rot) =
+            Vec2Rot(v.x * other.v.x, v.y * other.v.y, r * other.r)
+
+    fun clampComponents(maxMag: Double) =
+            Vec2Rot(v.x.clamp(-maxMag, maxMag), v.y.clamp(-maxMag, maxMag), r.clamp(-maxMag, maxMag))
+
     companion object {
         val zero = Vec2Rot(Vec2.zero, 0.0)
     }

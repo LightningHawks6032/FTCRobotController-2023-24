@@ -25,7 +25,7 @@ class PID1D(val coefficients: Coefficients) {
     data class Coefficients(
             var P: Double, var I: Double, var D: Double,
             val iDecay: Double,
-            val biasSlope: Double,
-            val bias: Double,
+            val biasSlope: Double = 0.0,
+            val bias: Double = 0.0,
     )
 }

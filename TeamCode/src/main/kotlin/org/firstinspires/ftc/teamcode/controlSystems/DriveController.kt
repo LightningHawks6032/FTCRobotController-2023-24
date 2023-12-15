@@ -6,8 +6,6 @@ import org.firstinspires.ftc.teamcode.hardware.motion.IDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.IOdometry
 import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
-import kotlin.math.abs
-import kotlin.math.max
 
 const val MAX_POW = 0.70710678118 // sqrt(1/2)
 
@@ -15,6 +13,8 @@ class DriveController(
         private val output: IDrive,
         private val input: IOdometry,
         control_pid_init: PID1D.Coefficients,
+        /** Default scale for the PID force, linear part in Newtons, angular part in Newton-cm*/
+        val forceMagnitude: Vec2Rot,
 ) {
     @NotForCompetition
     fun debugTakeControl(): Pair<IOdometry, IDrive> {
@@ -64,8 +64,14 @@ class DriveController(
                 target.pos, target.vel,
                 dt
         )
-        output.power = input.robot2worldTransform().transformVelInv(
-                pow * (MAX_POW / max(MAX_POW, max(pow.v.mag, abs(pow.r))))
+        val robot2world = input.robot2worldTransform()
+        output.setForce(
+                forceMagnitude componentwiseTimes robot2world.transformVelInv(
+                        pow.clampComponents(1.0)// * (MAX_POW / max(MAX_POW, max(pow.v.mag, abs(pow.r))))
+                ),
+                robot2world.transformVelInv(
+                        input.vel
+                ),
         )
     }
 
@@ -74,9 +80,9 @@ class DriveController(
     }
 
     class Control(init_coefficients: PID1D.Coefficients) {
-        private val controlX = QLearningAutoPIDAgent(init_coefficients)
-        private val controlY = QLearningAutoPIDAgent(init_coefficients)
-        private val controlR = QLearningAutoPIDAgent(init_coefficients)
+        private val controlX = PID1D(init_coefficients)
+        private val controlY = PID1D(init_coefficients)
+        private val controlR = PID1D(init_coefficients)
         fun tick(
                 xp: Vec2Rot, xd: Vec2Rot,
                 tp: Vec2Rot, td: Vec2Rot,

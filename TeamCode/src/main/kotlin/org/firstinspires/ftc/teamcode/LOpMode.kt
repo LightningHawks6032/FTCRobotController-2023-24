@@ -4,11 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.util.RobotLog
 import kotlinx.coroutines.*
 import org.firstinspires.ftc.teamcode.event.WatchList
+import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.ftcGlue.WithTelemetry
 import org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware.FTCGamepad
 import org.firstinspires.ftc.teamcode.ftcGlue.ftcHardware.FTCHardwareMap
 import org.firstinspires.ftc.teamcode.hardware.Gamepad
+import org.firstinspires.ftc.teamcode.util.NotForCompetition
 import org.firstinspires.ftc.teamcode.util.Timer
 import org.firstinspires.ftc.teamcode.util.TriggerLock
 import org.firstinspires.ftc.teamcode.util.ValueLock
@@ -22,6 +24,10 @@ open class LOpMode<T : Any>(
     val scope = CoroutineScope(Dispatchers.Default)
     private var coroutineJob: Job? = null
     private var toThrow: Throwable? = null
+
+    private lateinit var rawHardwareInternal: IHardwareMap
+    @NotForCompetition
+    override val rawHardware get() = rawHardwareInternal
 
     final override var duringInit = false; private set
     final override var duringRun = false; private set
@@ -49,7 +55,9 @@ open class LOpMode<T : Any>(
      * This method will be called once when the INIT button is pressed.
      */
     override fun init() {
-        robot = robotSpec.impl(FTCHardwareMap(hardwareMap))
+        val hardware = FTCHardwareMap(hardwareMap)
+        rawHardwareInternal = hardware
+        robot = robotSpec.impl(hardware)
         timerSinceInit.isTiming = true
         duringInit = true
         coroutineJob = scope.launch {
@@ -261,4 +269,7 @@ interface OpBaseScope<T> {
     val gamepadA: Gamepad
     val gamepadB: Gamepad
     val withTelemetry: WithTelemetry
+
+    @NotForCompetition
+    val rawHardware: IHardwareMap
 }

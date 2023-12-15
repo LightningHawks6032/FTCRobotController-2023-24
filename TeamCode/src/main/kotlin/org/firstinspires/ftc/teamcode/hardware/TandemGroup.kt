@@ -23,7 +23,13 @@ interface TandemGroup {
                         motor.power = power
                     }
                 }
-
+            fun setTorque(torque: Double, currentVel: Double) {
+                val dividedTorque = torque / (followers.size + 1)
+                leader.setTorque(dividedTorque, currentVel)
+                for (follower in followers) {
+                    follower.setTorque(dividedTorque, currentVel)
+                }
+            }
         }
     }
     class Servo(

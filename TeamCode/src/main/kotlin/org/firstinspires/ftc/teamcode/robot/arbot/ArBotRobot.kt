@@ -28,8 +28,8 @@ DCMotor Mappings:
 - "br" (`CH[1]`): back right drive motor, right odometry wheel
 - "bl" (`CH[0]`): back left drive motor
 
-- "a": (`EH[0]`) intake arm angle motor
-- "s": (`EH[1]`) intake high speed spinner motor
+- "s": (`EH[0]`) intake high speed spinner motor
+- "a": (`EH[1]`) intake arm angle motor
 
 - "l0": (`EH[2]`) out take lifter linear slide motor
 - "l1": (`EH[3]`) out take lifter linear slide motor (the other one)
@@ -44,6 +44,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             Vec2Rot.zero,
             Motor.PhysicalSpec.GOBILDA_5202_0002_0005,
             MecanumDrive.ReversalPattern(left = true),
+            wheelRadiusInches = 96.0 / 2 * MM_TO_IN,
+            wheelDisplacementInches = 253.0 * MM_TO_IN,
             MecanumDrive.Ids(
                     fr = "fr", // front-right motor
                     fl = "fl", // front-left motor
@@ -57,7 +59,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             x0ReaderPos = (+196.0 + 27.17) * MM_TO_IN,
             x1ReaderPos = (-196.0 + 27.17) * MM_TO_IN,
             Motor.PhysicalSpec.GOBILDA_ODOMETRY_POD,
-            48.0 * MM_TO_IN,
+            48.0 / 2 * MM_TO_IN,
             ThreeWheelOdometry.ReversalPattern(
                     y = true,
                     x0 = false,
@@ -121,14 +123,18 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
 
         val drive = run {
             threeWheelOdometry.Impl(hardwareMap)
-            DriveController(mecanum.Impl(hardwareMap), odometry, PID1D.Coefficients(
-                    P = 0.5,
-                    I = 0.5,
-                    D = 0.5,
-                    iDecay = 4.0,
-                    bias = 0.05,
-                    biasSlope = 0.5,
-            ))
+            DriveController(
+                    mecanum.Impl(hardwareMap), odometry,
+                    PID1D.Coefficients(
+                            P = 0.5,
+                            I = 0.3,
+                            D = 1.5,
+                            iDecay = 2.0,
+                            bias = 0.05,
+                            biasSlope = 1.5,
+                    ),
+                    Vec2Rot(20.0, 20.0, 25000.0),
+            )
         }
 
         val intake = intakeRef.Impl(hardwareMap)

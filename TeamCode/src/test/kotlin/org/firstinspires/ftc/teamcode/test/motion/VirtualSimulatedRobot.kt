@@ -9,20 +9,38 @@ import kotlin.math.*
 private const val GRAVITY_ACCEL = 9.807
 
 class VirtualSimulatedRobot(
+        startPos: Vec2Rot,
         private val mass: Double,
         private val momentOfInertia: Double,
         private val muStatic: Double,
         private val muKinetic: Double,
-        private val getForce: (Vec2Rot, Vec2Rot, VirtualSimulatedRobot) -> Vec2Rot = { p, v, r -> defaultGetForce(p, v,r) },
+        private val getForceFromPower: (Vec2Rot, Vec2Rot, VirtualSimulatedRobot) -> Vec2Rot = { p, v, r -> defaultGetForce(p, v, r) },
 ) : IOdometry(), IDrive {
+    init {
+        pos = startPos
+    }
+    var usingForce = false
     override var power = Vec2Rot.zero
+        set(value) {
+            field = value
+            usingForce = false
+        }
+    var force = Vec2Rot.zero
+    override fun setForce(force: Vec2Rot, currentVel: Vec2Rot) {
+        this.force = force
+        usingForce = true
+    }
 
-    private var realPos = Vec2Rot.zero
+    private var realPos = startPos / METER_TO_IN
     private var realVel = Vec2Rot.zero
     private var realAcc = Vec2Rot.zero
 
     private fun tickPhysics(dt: Double) {
-        var force = robot2worldTransform().transformVelFwd(getForce(power, realVel, this))
+        var force = if (usingForce) {
+            this.force
+        } else {
+            robot2worldTransform().transformVelFwd(getForceFromPower(power, realVel, this))
+        }
 
         force -= if (realVel.v.magSq < 0.01.pow(2) && realVel.r.absoluteValue < 0.01.pow(2)) {
             // static
@@ -53,9 +71,9 @@ class VirtualSimulatedRobot(
             tickPhysics(dt / physicsSubTicks)
         }
 
-        pos = realPos * METER_TO_IN
-        vel = realVel * METER_TO_IN
-        acc = realAcc * METER_TO_IN
+        pos = realPos.transformP { it * METER_TO_IN } * 1.05
+        vel = realVel.transformP { it * METER_TO_IN } * 1.05
+        acc = realAcc.transformP { it * METER_TO_IN } * 1.05
     }
 
     override fun assertPosition(newPos: Vec2Rot) {

@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.hardware.motion.AssumptionOdometry
 import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
+import org.firstinspires.ftc.teamcode.util.MM_TO_IN
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import kotlin.time.Duration.Companion.seconds
@@ -104,6 +105,8 @@ class RobotA : IRobot<RobotA.Impl> {
             MecanumDrive.ReversalPattern(
                     right = true
             ),
+            wheelRadiusInches = 96.0 / 2 * MM_TO_IN,
+            wheelDisplacementInches = 10.0, // this robot is disassembled irl so idk lol
             MecanumDrive.Ids.default,
     )
     val dbgOdo = AssumptionOdometry()
@@ -128,7 +131,8 @@ class RobotA : IRobot<RobotA.Impl> {
         private val drive = DriveController(
                 driveDrive,
                 odo,
-                PID1D.Coefficients(0.5,0.5,0.5,4.0,0.0,0.0)
+                PID1D.Coefficients(0.5,0.5,0.5,4.0,0.0,0.0),
+                Vec2Rot(20.0, 20.0, 25000.0),
         )
 //        private val encoder = this@RobotA.encoder.Impl(hardwareMap)
 

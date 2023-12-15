@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.test.motion
 import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.test.ftcGlue.CIHardwareMap
+import org.firstinspires.ftc.teamcode.util.MM_TO_IN
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import org.junit.Test
@@ -19,6 +20,8 @@ class MecanumTests {
                 Vec2Rot.zero,
                 spec,
                 MecanumDrive.ReversalPattern(),
+                wheelRadiusInches = 96.0 / 2 * MM_TO_IN,
+                wheelDisplacementInches = 10.0,
                 ids,
         ).Impl(hardware)
 
@@ -160,6 +163,8 @@ class MecanumTests {
                 Vec2Rot.zero,
                 spec,
                 reversePattern,
+                wheelRadiusInches = 96.0 / 2 * MM_TO_IN,
+                wheelDisplacementInches = 10.0,
                 ids,
         ).Impl(hardware)
 
