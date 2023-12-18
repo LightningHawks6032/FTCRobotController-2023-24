@@ -9,6 +9,7 @@ class ActuatorPositionController(
         private val setForce: (Double, Double)->Unit,
         posDelegate: KProperty0<Double>,
         motorPosDelegate: KProperty0<Double>,
+        val forceScale: Double,
 ) {
     private val pos by posDelegate
     private val deltaPos by DeltaValue.Double { pos }
@@ -45,7 +46,7 @@ class ActuatorPositionController(
                 target.pos, target.vel,
                 dt
         )
-        setForce(force, motorVel)
+        setForce(force * forceScale, motorVel)
 //        println("TP: ${target.pos}, $force")
     }
 }

@@ -48,7 +48,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             gamepadB.stick.right.pos.y * slowMultiplierB
         }
         var outtakeX by robot.outtake.controller::targetPosition
-        outtakeX = (outtakeX + dt * outtakeV).clamp(-1.0, outtakeArmMaxHeight)
+        outtakeX = (outtakeX + dt * outtakeV).clamp(0.0, outtakeArmMaxHeight)
         watches(gamepadB.x::Watch) { it.pressed.bind {
             robot.outtake.outtakeTilt = !robot.outtake.outtakeTilt
         } }

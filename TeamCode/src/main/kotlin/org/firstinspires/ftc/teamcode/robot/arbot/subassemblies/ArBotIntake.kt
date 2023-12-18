@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.util.withWriteEffect
 
 class ArBotIntake(
         doReverse: Boolean = false,
+        val forceScale: Double,
         private val pidCoefficients: PID1D.Coefficients,
 ) {
     private val anglerRef = Motor("a", Motor.PhysicalSpec.GOBILDA_5202_0002_0005, Motor.Config { reversed = doReverse })
@@ -27,7 +28,7 @@ class ArBotIntake(
 
         var pos by angler::pos.delegate().withWriteEffect { onEditZeroPos(it) }
 
-        val angleController = ActuatorPositionController(pidCoefficients, angler::setTorque, this::pos, angler::pos)
+        val angleController = ActuatorPositionController(pidCoefficients, angler::setTorque, this::pos, angler::pos, forceScale)
         fun tick(dt: Double) = angleController.tick(dt)
 
         var spinPower by spinner::power

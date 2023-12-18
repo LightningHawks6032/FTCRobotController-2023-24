@@ -90,6 +90,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
 
     private val intakeRef = ArBotIntake(
             true,
+            5.0,
             PID1D.Coefficients(
                     P = 1.0,
                     I = 0.2,
@@ -103,6 +104,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             false,
             tiltServoRange = DelegateRange(-1.0, 1.0), // TODO tiltServoRange
             dropServoRange = DelegateRange(-0.5, 0.0),
+            5.0,
             PID1D.Coefficients(
                     P = 1.0,
                     I = 0.2,
@@ -126,14 +128,15 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             DriveController(
                     mecanum.Impl(hardwareMap), odometry,
                     PID1D.Coefficients(
-                            P = 0.5,
-                            I = 0.3,
-                            D = 1.5,
+                            P = 0.4,
+                            I = 0.4,
+                            D = 0.9,
                             iDecay = 2.0,
                             bias = 0.05,
                             biasSlope = 1.5,
                     ),
-                    Vec2Rot(20.0, 20.0, 25000.0),
+//                    Vec2Rot(20.0*10, 20.0*10, 25000.0/20),
+                    Vec2Rot(5.0, 5.00,5.00),
             )
         }
 

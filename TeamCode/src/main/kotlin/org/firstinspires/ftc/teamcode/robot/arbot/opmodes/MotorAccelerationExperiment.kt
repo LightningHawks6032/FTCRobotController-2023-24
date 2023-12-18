@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -38,6 +39,7 @@ private class MotorExperimentData {
 
 @OptIn(NotForCompetition::class)
 @Autonomous
+@Disabled
 class MotorAccelerationExperiment : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val data = MotorExperimentData()
 //    val server = embeddedServer(Netty, port = PORT) {

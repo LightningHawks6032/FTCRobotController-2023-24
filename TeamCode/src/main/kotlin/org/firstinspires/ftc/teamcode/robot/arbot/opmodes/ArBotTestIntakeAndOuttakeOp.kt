@@ -17,8 +17,16 @@ class ArBotTestIntakeAndOuttakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     createLoop {
         /// intake
-        robot.intake.tick(dt)
-        robot.outtake.tick(dt)
+        if (gamepadA.a.isHeld) {
+            robot.intake.tick(dt)
+        } else {
+            robot.intake.debugAnglePower = 0.0
+        }
+        if (gamepadA.b.isHeld) {
+            robot.outtake.tick(dt)
+        } else {
+            robot.outtake.debugLifterPower = 0.0
+        }
 
         val intakeTarget = gamepadA.stick.left.pos.x
         robot.intake.angleController.targetPosition = intakeTarget

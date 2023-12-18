@@ -14,6 +14,7 @@ class ArBotOuttake(
         doReverse: Boolean = false,
         private val tiltServoRange: DelegateRange,
         private val dropServoRange: DelegateRange,
+        val forceScale: Double,
         private val pidCoefficients: PID1D.Coefficients,
 ) {
     private val lifterRef = TandemGroup.Motor(
@@ -38,7 +39,7 @@ class ArBotOuttake(
                 .withWriteEffect { onEditZeroPos(it) }
                 .times { IN_PER_RAD_OUTTAKE_SLIDES }
 
-        val controller = ActuatorPositionController(pidCoefficients, lifter::setTorque, this::pos, lifter::pos)
+        val controller = ActuatorPositionController(pidCoefficients, lifter::setTorque, this::pos, lifter::pos, forceScale)
         fun tick(dt: Double) = controller.tick(dt)
 
         private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
