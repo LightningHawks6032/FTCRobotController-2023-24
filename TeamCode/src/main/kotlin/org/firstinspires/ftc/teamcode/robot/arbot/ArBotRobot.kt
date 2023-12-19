@@ -101,14 +101,14 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             )
     )
     private val outtakeRef = ArBotOuttake(
-            false,
-            tiltServoRange = DelegateRange(-1.0, 1.0), // TODO tiltServoRange
+            true,
+            tiltServoRange = DelegateRange(-0.05, 0.3),
             dropServoRange = DelegateRange(-0.5, 0.0),
-            5.0,
+            45.0,
             PID1D.Coefficients(
-                    P = 1.0,
-                    I = 0.2,
-                    D = 0.5,
+                    P = 0.0,
+                    I = 0.0,
+                    D = 0.9,
                     iDecay = 4.0,
                     biasSlope = 0.0,
                     bias = 0.0,

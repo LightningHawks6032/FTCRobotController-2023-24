@@ -36,7 +36,7 @@ class ArBotOuttake(
         }
 
         var pos by lifter::pos.delegate()
-                .withWriteEffect { onEditZeroPos(it) }
+                .withWriteEffect { doEdit -> onEditZeroPos(doEdit) }
                 .times { IN_PER_RAD_OUTTAKE_SLIDES }
 
         val controller = ActuatorPositionController(pidCoefficients, lifter::setTorque, this::pos, lifter::pos, forceScale)
