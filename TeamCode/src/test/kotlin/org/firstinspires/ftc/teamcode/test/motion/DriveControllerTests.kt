@@ -51,7 +51,12 @@ class DriveControllerTests {
                 muStatic = 0.04,
         )
 
-        val drive = DriveController(sim, sim, PID1D.Coefficients(0.6, 0.2, 0.9, 0.5), Vec2Rot(20.0, 20.0, 25000.0))
+        val drive = DriveController(
+                sim, sim,
+                PID1D.Coefficients(0.6, 0.2, 0.9, 0.5),
+                PID1D.Coefficients(0.6, 0.2, 0.9, 0.5),
+                Vec2Rot(20.0, 20.0, 25000.0),
+        )
 
         val duration = 10.0
         val dt = 0.05

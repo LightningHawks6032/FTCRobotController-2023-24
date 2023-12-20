@@ -132,6 +132,7 @@ class RobotA : IRobot<RobotA.Impl> {
                 driveDrive,
                 odo,
                 PID1D.Coefficients(0.5,0.5,0.5,4.0,0.0,0.0),
+                PID1D.Coefficients(0.5,0.5,0.5,4.0,0.0,0.0),
                 Vec2Rot(20.0, 20.0, 25000.0),
         )
 //        private val encoder = this@RobotA.encoder.Impl(hardwareMap)

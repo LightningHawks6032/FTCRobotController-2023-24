@@ -24,3 +24,11 @@ val Double.Companion.ops
             0.0,
             1.0,
     )
+
+fun DoubleArray.diff() = if (size <= 1)
+    doubleArrayOf()
+else
+    (0 until (size - 1))
+            .map { i -> this[i + 1] - this[i] }
+            .toList()
+            .toDoubleArray()

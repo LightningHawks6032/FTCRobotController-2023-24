@@ -39,7 +39,13 @@ class ArBotOuttake(
                 .withWriteEffect { doEdit -> onEditZeroPos(doEdit) }
                 .times { IN_PER_RAD_OUTTAKE_SLIDES }
 
-        val controller = ActuatorPositionController(pidCoefficients, lifter::setTorque, this::pos, lifter::pos, forceScale)
+        val controller = ActuatorPositionController(
+                pidCoefficients,
+                lifter::setTorque, this::pos, lifter::pos,
+                lifterRef.leaderMotorSpec,
+                IN_PER_RAD_OUTTAKE_SLIDES,
+                forceScale,
+        )
         fun tick(dt: Double) = controller.tick(dt)
 
         private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))

@@ -28,7 +28,13 @@ class ArBotIntake(
 
         var pos by angler::pos.delegate().withWriteEffect { onEditZeroPos(it) }
 
-        val angleController = ActuatorPositionController(pidCoefficients, angler::setTorque, this::pos, angler::pos, forceScale)
+        val angleController = ActuatorPositionController(
+                pidCoefficients,
+                angler::setTorque, this::pos, angler::pos,
+                anglerRef.motorSpec,
+                1.0,
+                forceScale,
+        )
         fun tick(dt: Double) = angleController.tick(dt)
 
         var spinPower by spinner::power

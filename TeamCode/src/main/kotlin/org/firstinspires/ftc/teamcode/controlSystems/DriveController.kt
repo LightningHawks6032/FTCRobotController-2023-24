@@ -12,7 +12,8 @@ const val MAX_POW = 0.70710678118 // sqrt(1/2)
 class DriveController(
         private val output: IDrive,
         private val input: IOdometry,
-        control_pid_init: PID1D.Coefficients,
+        control_xy_pid_init: PID1D.Coefficients,
+        control_r_pid_init: PID1D.Coefficients,
         /** Default scale for the PID force, linear part in Newtons, angular part in Newton-cm*/
         val forceMagnitude: Vec2Rot,
 ) {
@@ -46,7 +47,7 @@ class DriveController(
         t.ln("::::::::::::::::::::::::")
     }
 
-    private val pid = Control(control_pid_init)
+    private val pid = Control(control_xy_pid_init, control_r_pid_init)
 
     var t = 0.0
     fun tick(dt: Double) {
@@ -79,10 +80,13 @@ class DriveController(
         output.power = Vec2Rot.zero
     }
 
-    class Control(init_coefficients: PID1D.Coefficients) {
-        private val controlX = PID1D(init_coefficients)
-        private val controlY = PID1D(init_coefficients)
-        private val controlR = PID1D(init_coefficients)
+    class Control(
+            init_xy_coefficients: PID1D.Coefficients,
+            init_r_coefficients: PID1D.Coefficients,
+    ) {
+        private val controlX = PID1D(init_xy_coefficients)
+        private val controlY = PID1D(init_xy_coefficients)
+        private val controlR = PID1D(init_r_coefficients)
         fun tick(
                 xp: Vec2Rot, xd: Vec2Rot,
                 tp: Vec2Rot, td: Vec2Rot,

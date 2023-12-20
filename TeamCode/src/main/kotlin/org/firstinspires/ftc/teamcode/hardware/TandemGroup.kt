@@ -30,7 +30,9 @@ interface TandemGroup {
                     follower.setTorque(dividedTorque, currentVel)
                 }
             }
+
         }
+        val leaderMotorSpec get() = leaderRef.motorSpec
     }
     class Servo(
             private val leaderRef: org.firstinspires.ftc.teamcode.hardware.Servo,
