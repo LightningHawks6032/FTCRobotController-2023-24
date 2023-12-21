@@ -64,6 +64,7 @@ class TestOp : LOpMode<RobotA.Impl>(RobotA.instance, {
 }, FinishedBehaviour.KEEP_ALIVE_UNTIL_LOOPS_END)
 
 @Autonomous
+@Disabled
 class TestAuto : LOpMode<RobotA.Impl>(RobotA.instance, {
     robot.init()
 
@@ -92,7 +93,7 @@ class TestAuto : LOpMode<RobotA.Impl>(RobotA.instance, {
         bezierR(UntilAt(5.0.seconds), 0.0)
 
         stationaryUntilAt(6.0.seconds)
-    })
+    }.first)
 
     robot.halt()
     println("!!!!!!!!!!!!!!!! EXIT")

@@ -25,6 +25,9 @@ class DriveController(
 
     private var disableTicking = false
 
+    val inputPos get() = input.pos
+    val inputVel get() = input.vel
+
     var path: MotionPath<Vec2Rot>? = null
     var targetPos: Vec2Rot = input.pos
 

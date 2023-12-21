@@ -63,7 +63,7 @@ class DriveControllerTests {
 
         val data = mutableListOf<Pair<Triple<Double, Double, Double>, Triple<Double, Double, Double>>>()
 
-        val path = buildPath(sim.pos, Vec2Rot.zero) {
+        val (path, _) = buildPath(sim.pos, Vec2Rot.zero) {
             bezierR(UntilAt(2.0.seconds), 0.0, 0.0)
             stationaryR(UntilAt(5.0.seconds))
             bezierR(UntilAt(7.0.seconds), -3.0, -1.0)

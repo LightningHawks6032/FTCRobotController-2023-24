@@ -38,6 +38,9 @@ Servo Mappings:
 - "t" (`CH[0]`): outtake tilt angle servo
 - "d" (`CH[1]`): outtake drop servo
 
+
+ ((0,0),0) in robot space is in the center of the 18x18in limit, with +x in the front of the robot.
+
  */
 object ArBotRobot : IRobot<ArBotRobot.Impl> {
     private val mecanum = MecanumDrive(

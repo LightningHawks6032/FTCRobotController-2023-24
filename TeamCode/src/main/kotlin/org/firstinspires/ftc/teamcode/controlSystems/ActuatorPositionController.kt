@@ -31,6 +31,10 @@ class ActuatorPositionController(
     private val pid = PID1D(pidCoefficients)
 
     var path: MotionPath<Double>? = null
+        set(value) {
+            field = value
+            t = 0.0
+        }
     var targetPosition = posGen.x
 
 
@@ -53,6 +57,7 @@ class ActuatorPositionController(
 
         val target = path?.sampleClamped(t)
                 ?: MotionPath.PathPoint(targetPosition, 0.0, 0.0)
+        targetPosition = target.pos
 
         val force = pid.tick(
                 pos, vel,
