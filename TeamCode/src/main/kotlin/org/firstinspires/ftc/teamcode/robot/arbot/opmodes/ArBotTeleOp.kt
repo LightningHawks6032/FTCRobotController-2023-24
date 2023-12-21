@@ -15,8 +15,8 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val outtakeArmMaxHeight = 36.0
     robot.intake.pos = 0.0 // assert that we start here
 
-    selectDebugBool("switch_control_scheme")
-    val switchControlScheme = DebugVars.bool["switch_control_scheme"] ?: false
+//    selectDebugBool("switch_control_scheme")
+//    val switchControlScheme = DebugVars.bool["switch_control_scheme"] ?: false
 
     withTelemetry {
         ln("initialized, waiting for start")
@@ -29,7 +29,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     createLoop {
         val slowA = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
         val slowMultiplierA = if (slowA) 0.1 else 0.3
-        val slowB = !gamepadB.bumper.let { it.left.isHeld || it.right.isHeld }
+        val slowB = gamepadB.bumper.let { it.left.isHeld || it.right.isHeld }
         val slowMultiplierB = if (slowB) 0.3 else 1.0
         // intake/outtake controls
 
@@ -42,19 +42,17 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         @OptIn(NotForCompetition::class)
         robot.intake.debugAnglePower = intakeV
 
+        robot.intake.spinPower = gamepadB.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
+
         // ---------- OUTTAKE ---------- //
         /// Outtake velocity (positive -> up)
-        var outtakeV = 5.0 * if (switchControlScheme) {
-            gamepadA.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) + (if (it.down.isHeld) -1.0 else 0.0) } * slowMultiplierA
-        } else {
-            gamepadB.stick.right.pos.y * slowMultiplierB
-        }
+        var outtakeV = 19.5 * -gamepadB.stick.right.pos.y * slowMultiplierB
         var outtakeX by robot.outtake.controller::targetPosition
         if (outtakeX < 5.0) {
             outtakeV *= 0.5
         }
         if (outtakeX < 2.0 && outtakeV <= 0.01) {
-            outtakeV = -0.25
+            outtakeV = -2.0
         }
         outtakeX = (outtakeX + dt * outtakeV).clamp(0.0, outtakeArmMaxHeight)
         watches(gamepadB.x::Watch) {
@@ -62,6 +60,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 robot.outtake.outtakeTilt = !robot.outtake.outtakeTilt
             }
         }
+
         // Force-close the outtake box under a certain point to avoid damage.
         // (if expected position 0.5 seconds in the future is less than 10in)
         if (outtakeX + outtakeV * 0.5 < 10.0) {
@@ -76,14 +75,12 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
     }
 
-//    val (odometry, drive) = robot.drive.debugTakeControl()
-
-    var pos = robot.drive.targetPos
+    var pos = robot.drive.inputPos
 
     createLoop {
         /// drive
         val slow = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
-        val speedLinear = if (slow) 6.0 else 12.0
+        val speedLinear = if (slow) 12.0 else 36.0
         val speedAngular = if (slow) PI/2 else PI
 
         // triggers to strafe
@@ -91,19 +88,19 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 x = gamepadA.stick.left.pos.y,
                 y = gamepadA.trigger.let { it.right - it.left },
                 r = gamepadA.stick.right.pos.x,
-        )
+        ).transformP { it.rotate(pos.r) }
         val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
 
-        pos += vel * dt
-        pos = pos.transformP { (x,y) ->
-            val radius = 9.0 * (cos(abs((abs(pos.r)%(PI/2))-PI/4))) * sqrt(0.5)
-            Vec2(
-                x.coerceIn(POIs.fieldBounds.x.first + radius, POIs.fieldBounds.x.second - radius),
-                y.coerceIn(POIs.fieldBounds.y.first + radius, POIs.fieldBounds.y.second - radius),
-            )
-        }.let {
-            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
-        }
+        pos += (vel * dt).transformP { (x,y) -> Vec2(x.coerceIn(-1.0,1.0),y.coerceIn(-1.0,1.0)) }
+//        pos = pos.transformP { (x,y) ->
+//            val radius = 9.0 * (cos(abs((abs(pos.r)%(PI/2))-PI/4))) * sqrt(0.5)
+//            Vec2(
+//                x.coerceIn(POIs.fieldBounds.x.first + radius, POIs.fieldBounds.x.second - radius),
+//                y.coerceIn(POIs.fieldBounds.y.first + radius, POIs.fieldBounds.y.second - radius),
+//            )
+//        }.let {
+//            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
+//        }
 
         robot.drive.targetPos = pos
         robot.drive.tick(dt)

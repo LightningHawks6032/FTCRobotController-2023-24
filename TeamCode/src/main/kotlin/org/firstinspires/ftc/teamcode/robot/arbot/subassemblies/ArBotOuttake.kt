@@ -51,7 +51,7 @@ class ArBotOuttake(
         private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
         private var dropServoPos by dropServo::pos.delegate().remapRange(dropServoRange, DelegateRange(-1.0,1.0))
         var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { tilt ->
-            tiltServoPos = if (tilt) 1.0 else -1.0
+            tiltServoPos = if (tilt) 1.0 else -0.8
         }
         var dropOpen by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
             dropServoPos = if (open) 1.0 else -1.0

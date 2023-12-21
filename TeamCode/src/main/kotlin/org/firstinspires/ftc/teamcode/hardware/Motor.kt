@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.hardware
 import com.qualcomm.robotcore.util.RobotLog
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.util.*
+import kotlin.math.absoluteValue
 
 class Motor(
         private val id: String,
@@ -81,9 +82,14 @@ class Motor(
                 )
 
         fun setTorque(torqueNCM: Double, currentVel: Double) {
-            power = (
+            val powerNext = (
                     torqueNCM / motorSpec.stallTorqueNCM + currentVel / motorSpec.noLoadSpeedRadPerSec
                     ).clamp(-1.0, 1.0)
+            power = if (powerNext.absoluteValue < 0.1) {
+                0.0
+            } else {
+                powerNext
+            }
         }
 
         private val scaledPosRaw get() = idcMotor.pos * motorSpec.encoderRadPerTick

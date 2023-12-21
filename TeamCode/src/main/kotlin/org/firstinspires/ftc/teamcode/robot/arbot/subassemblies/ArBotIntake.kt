@@ -40,6 +40,6 @@ class ArBotIntake(
         var spinPower by spinner::power
 
         @NotForCompetition
-        var debugAnglePower by spinner::power
+        var debugAnglePower by angler::power
     }
 }

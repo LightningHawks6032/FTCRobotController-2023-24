@@ -111,7 +111,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             PID1D.Coefficients(
                     P = 0.5,
                     I = 0.3,
-                    D = 0.3,
+                    D = 0.25,
                     iDecay = 4.0,
                     biasSlope = 0.0,
                     bias = 0.0,
