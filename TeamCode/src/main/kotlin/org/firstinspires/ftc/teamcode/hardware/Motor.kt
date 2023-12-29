@@ -18,11 +18,15 @@ class Motor(
     /** Whether or not this motor uses it's power */
     val useMotor = !motorSpec.encoderOnly
 
+    val minTorque = config.minTorque
+
     private var zeroPos = 0.0
 
     class Config {
         var reversed = false
         var useEncoder = true
+
+        var minTorque = 0.0
 
         companion object {
             val default get() = Config()
@@ -85,7 +89,7 @@ class Motor(
             val powerNext = (
                     torqueNCM / motorSpec.stallTorqueNCM + currentVel / motorSpec.noLoadSpeedRadPerSec
                     ).clamp(-1.0, 1.0)
-            power = if (powerNext.absoluteValue < 0.1) {
+            power = if (torqueNCM.absoluteValue < minTorque) {
                 0.0
             } else {
                 powerNext

@@ -18,8 +18,14 @@ class ArBotOuttake(
         private val pidCoefficients: PID1D.Coefficients,
 ) {
     private val lifterRef = TandemGroup.Motor(
-            Motor("l0", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config { reversed = doReverse }),
-            Motor("l1", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config { reversed = doReverse.not() }),
+            Motor("l0", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config {
+                reversed = doReverse
+                minTorque = 2.0
+            }),
+            Motor("l1", Motor.PhysicalSpec.GOBILDA_5202_0002_0003, Motor.Config {
+                reversed = doReverse.not()
+                minTorque = 2.0
+            }),
     )
     private val tiltServoRef = Servo("t", continuousRotation = false, Servo.Config { reversed = false })
     private val dropServoRef = Servo("d", continuousRotation = false, Servo.Config { reversed = true })
@@ -46,7 +52,10 @@ class ArBotOuttake(
                 IN_PER_RAD_OUTTAKE_SLIDES,
                 forceScale,
         )
-        fun tick(dt: Double) = controller.tick(dt)
+        fun tick(dt: Double) {
+            controller.tick(dt, shutdownIf = { pos, target -> pos < 0.3 && target < 0.3 })
+            println("pos $pos, target ${controller.targetPosition}")
+        }
 
         private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
         private var dropServoPos by dropServo::pos.delegate().remapRange(dropServoRange, DelegateRange(-1.0,1.0))

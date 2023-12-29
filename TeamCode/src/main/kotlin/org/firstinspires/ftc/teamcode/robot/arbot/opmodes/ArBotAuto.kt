@@ -31,7 +31,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     val path0 = buildPath(startingPos, Vec2Rot.zero) {
         // go to center of upper field at t = 1.5
-        bezierXY(UntilAt(1.5.seconds), Vec2(36.0, 0.0))
+        bezierXY(UntilAt(1.5.seconds), POIs.relativePos(alliance, 36.0, 36.0))
         stationaryR(Lasting(0.2.seconds))
         bezierR(UntilAt(1.5.seconds), 0.0, 0.0)
 
@@ -48,7 +48,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         bezierR(UntilAt(5.0.seconds), 0.0, 0.0)
         actAt(3.0.seconds) {
             robot.outtake.controller.path = BezierMotionPath.TDouble(
-                    CubicBezier.forEndpointTangents(2.0, 0.0, 0.0, 20.0, 0.0)
+                    CubicBezier.forEndpointTangents(2.0, 0.0, 0.0, 30.0, 0.0)
             )
         }
 
@@ -65,7 +65,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             robot.outtake.outtakeTilt = false
             robot.outtake.dropOpen = false
             robot.outtake.controller.path = BezierMotionPath.TDouble(
-                    CubicBezier.forEndpointTangents(2.0, 20.0, 0.0, 0.0, 0.0)
+                    CubicBezier.forEndpointTangents(2.0, 30.0, 0.0, 0.0, 0.0)
             )
         }
 

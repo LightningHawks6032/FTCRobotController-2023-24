@@ -39,7 +39,7 @@ class ActuatorPositionController(
 
 
     private var t = 0.0
-    fun tick(dt: Double) {
+    fun tick(dt: Double, shutdownIf: (Double, Double) -> Boolean = { _, _ -> false }) {
         t += dt
 
 //        println("dt $dt")
@@ -64,8 +64,14 @@ class ActuatorPositionController(
                 target.pos, target.vel,
                 dt
         )
-        println("target.pos ${target.pos} force $force")
-        setForce(force * forceScale, motorVel)
+        if (shutdownIf(pos, target.pos)) {
+            shutdownOutput()
+        } else {
+            setForce(force * forceScale, motorVel)
+        }
 //        println("TP: ${target.pos}, $force")
+    }
+    fun shutdownOutput() {
+        setForce(0.0, 0.0)
     }
 }

@@ -36,11 +36,11 @@ class VirtualSimulatedRobot(
     private var realAcc = Vec2Rot.zero
 
     private fun tickPhysics(dt: Double) {
-        var force = if (usingForce) {
+        var force = robot2worldTransform().transformVelFwd(if (usingForce) {
             this.force
         } else {
-            robot2worldTransform().transformVelFwd(getForceFromPower(power, realVel, this))
-        }
+            getForceFromPower(power, realVel, this)
+        })
 
         force -= if (realVel.v.magSq < 0.01.pow(2) && realVel.r.absoluteValue < 0.01.pow(2)) {
             // static

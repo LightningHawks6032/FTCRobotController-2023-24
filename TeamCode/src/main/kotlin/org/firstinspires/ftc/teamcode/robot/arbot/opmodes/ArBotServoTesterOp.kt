@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot.arbot.opmodes
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.robot.OpGroupName
@@ -9,7 +8,7 @@ import org.firstinspires.ftc.teamcode.util.NotForCompetition
 
 @NotForCompetition
 @TeleOp(name = "ServoTester", group = OpGroupName.DEBUGGING)
-@Disabled
+//@Disabled
 class ArBotServoTesterOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     withTelemetry {
         ln("HBot servo tester")
@@ -18,7 +17,7 @@ class ArBotServoTesterOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     var i = 0
     val servos = listOf(
             robot.outtake.debugControlDropServo(),
-            robot.outtake.debugControlTiltServo(),
+                robot.outtake.debugControlTiltServo(),
     )
     val labels = listOf("outtake-drop","outtake-tilt")
     val n = servos.size

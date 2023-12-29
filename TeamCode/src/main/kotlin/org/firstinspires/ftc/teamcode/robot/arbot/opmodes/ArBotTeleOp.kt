@@ -75,7 +75,9 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
     }
 
-    var pos = robot.drive.inputPos
+    var pos = Vec2Rot.zero
+    robot.drive.path = null
+    robot.drive.assertPosition(pos)
 
     createLoop {
         /// drive
@@ -85,9 +87,9 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
         // triggers to strafe
         val input = Vec2Rot(
-                x = gamepadA.stick.left.pos.y,
-                y = gamepadA.trigger.let { it.right - it.left },
-                r = gamepadA.stick.right.pos.x,
+                x = -gamepadA.stick.left.pos.y,
+                y = gamepadA.trigger.let { it.left - it.right },
+                r = -gamepadA.stick.right.pos.x,
         ).transformP { it.rotate(pos.r) }
         val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
 
@@ -102,8 +104,9 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 //            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
 //        }
 
-        robot.drive.targetPos = pos
-        robot.drive.tick(dt)
+        robot.drive.setPowerAndTrack(input.componentwiseTimes(Vec2Rot(1.0,1.0, 0.5)), dt)
+//        robot.drive.targetPos = pos
+//        robot.drive.tick(dt)
 
         withDriveStatus {
             robot.drive.writeTelemetry(this)

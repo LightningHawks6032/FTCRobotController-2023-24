@@ -53,6 +53,22 @@ class DriveController(
     private val pid = Control(control_xy_pid_init, control_r_pid_init)
 
     var t = 0.0
+    fun setPowerAndTrack(pow: Vec2Rot, dt: Double) {
+        if (disableTicking) return // disables ticking when [debugTakeControlOfOutput] is called.
+
+        t += dt
+        input.tick(dt)
+
+        val robot2world = input.robot2worldTransform()
+        output.setForce(
+                forceMagnitude componentwiseTimes robot2world.transformVelInv(
+                        pow.clampComponents(1.0)// * (MAX_POW / max(MAX_POW, max(pow.v.mag, abs(pow.r))))
+                ),
+                robot2world.transformVelInv(
+                        input.vel
+                ),
+        )
+    }
     fun tick(dt: Double) {
         if (disableTicking) return // disables ticking when [debugTakeControlOfOutput] is called.
 

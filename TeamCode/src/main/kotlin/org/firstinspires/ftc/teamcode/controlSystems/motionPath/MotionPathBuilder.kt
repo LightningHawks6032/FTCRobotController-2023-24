@@ -75,7 +75,8 @@ class MotionPathBuilder(
         }
 
         fun bezierR(end: EventTime, toPos: Double, toVel: Double = 0.0) {
-            val duration = end.durationSecondsFromNow(tEndXY).ensureIsNotNegativeDuration()
+            val duration = end.durationSecondsFromNow(tEndR).ensureIsNotNegativeDuration()
+//            val duration = end.durationSecondsFromNow(tEndXY).ensureIsNotNegativeDuration()
             addR(BezierMotionPath.TDouble(CubicBezier.forEndpointTangents(
                     duration,
                     lastPosR, lastVelR,
