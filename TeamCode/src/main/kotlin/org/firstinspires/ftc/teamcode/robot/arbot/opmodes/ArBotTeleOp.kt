@@ -13,6 +13,7 @@ private val POIs = FTCCenterStagePOIs
 @TeleOp
 class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val outtakeArmMaxHeight = 36.0
+    robot.outtake.pos = 0.0
     robot.intake.pos = 0.0 // assert that we start here
 
 //    selectDebugBool("switch_control_scheme")
@@ -35,7 +36,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
         // ---------- INTAKE ----------- //
         /// Intake velocity (positive -> down)
-        val intakeV = gamepadB.stick.left.pos.x * slowMultiplierB
+        val intakeV = gamepadB.trigger.let { it.left - it.right } * slowMultiplierB
         var intakeX by robot.intake.angleController::targetPosition
         intakeX = (intakeX + dt * intakeV).clamp(-PI / 2, 0.0)
 //        robot.intake.tick(dt)
@@ -83,17 +84,17 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         /// drive
         val slow = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
         val speedLinear = if (slow) 12.0 else 36.0
-        val speedAngular = if (slow) PI/2 else PI
+        val speedAngular = if (slow) PI / 2 else PI
 
         // triggers to strafe
         val input = Vec2Rot(
                 x = -gamepadA.stick.left.pos.y,
                 y = gamepadA.trigger.let { it.left - it.right },
                 r = -gamepadA.stick.right.pos.x,
-        ).transformP { it.rotate(pos.r) }
+        ).transformP { it.rotate(robot.drive.inputPos.r) }
         val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
 
-        pos += (vel * dt).transformP { (x,y) -> Vec2(x.coerceIn(-1.0,1.0),y.coerceIn(-1.0,1.0)) }
+        pos += (vel * dt).transformP { (x, y) -> Vec2(x.coerceIn(-1.0, 1.0), y.coerceIn(-1.0, 1.0)) }
 //        pos = pos.transformP { (x,y) ->
 //            val radius = 9.0 * (cos(abs((abs(pos.r)%(PI/2))-PI/4))) * sqrt(0.5)
 //            Vec2(
@@ -104,7 +105,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 //            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
 //        }
 
-        robot.drive.setPowerAndTrack(input.componentwiseTimes(Vec2Rot(1.0,1.0, 0.5)), dt)
+        robot.drive.setPowerAndTrack(input.componentwiseTimes(Vec2Rot(1.0, 1.0, 0.5)), dt)
 //        robot.drive.targetPos = pos
 //        robot.drive.tick(dt)
 
