@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.ThreeWheelOdometry
 import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotIntake
 import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotOuttake
+import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotPlaneLauncher
 import org.firstinspires.ftc.teamcode.util.*
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagInfoBuilder
@@ -117,6 +118,9 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
                     bias = 0.0,
             )
     )
+    private val planeLauncherRef = ArBotPlaneLauncher(
+            servoRange = DelegateRange(-1.0, 1.0),
+    )
 
 
     class Impl(hardwareMap: IHardwareMap) {
@@ -152,6 +156,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
 
         val intake = intakeRef.Impl(hardwareMap)
         val outtake = outtakeRef.Impl(hardwareMap)
+        val planeLauncher = planeLauncherRef.Impl(hardwareMap)
 
         suspend fun createVisionLoops(
                 scope: LOpMode<Impl>.RunScope,

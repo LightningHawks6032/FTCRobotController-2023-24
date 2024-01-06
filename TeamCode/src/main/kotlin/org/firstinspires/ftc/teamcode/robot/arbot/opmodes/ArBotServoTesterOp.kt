@@ -17,9 +17,10 @@ class ArBotServoTesterOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     var i = 0
     val servos = listOf(
             robot.outtake.debugControlDropServo(),
-                robot.outtake.debugControlTiltServo(),
+            robot.outtake.debugControlTiltServo(),
+            robot.planeLauncher.debugControlServo(),
     )
-    val labels = listOf("outtake-drop","outtake-tilt")
+    val labels = listOf("outtake-drop","outtake-tilt","plane-launcher")
     val n = servos.size
     createLoop {
         watches(gamepadA.dpad.up::Watch) {

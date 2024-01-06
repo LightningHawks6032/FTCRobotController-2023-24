@@ -32,7 +32,10 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         val slowMultiplierA = if (slowA) 0.1 else 0.3
         val slowB = gamepadB.bumper.let { it.left.isHeld || it.right.isHeld }
         val slowMultiplierB = if (slowB) 0.3 else 1.0
-        // intake/outtake controls
+        // thing controls
+
+        // ---------- PLANES ----------- //
+        robot.planeLauncher.launch = gamepadB.b.isHeld
 
         // ---------- INTAKE ----------- //
         /// Intake velocity (positive -> down)
@@ -71,8 +74,9 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         robot.outtake.tick(dt)
 
         withControlStatus {
-            ln("i", intakeX)
-            ln("o", outtakeX)
+            ln("intake", intakeX)
+            ln("outtake", outtakeX)
+            ln("launch", robot.planeLauncher.launch)
         }
     }
 
