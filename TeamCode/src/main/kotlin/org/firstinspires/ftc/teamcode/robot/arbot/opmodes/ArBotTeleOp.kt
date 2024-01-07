@@ -71,7 +71,14 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             robot.outtake.outtakeTilt = false
         }
         robot.outtake.dropOpen = gamepadB.a.isHeld
-        robot.outtake.tick(dt)
+        // reset slide position
+        if (gamepadB.y.isHeld) {
+            robot.outtake.pos = 0.0
+            @OptIn(NotForCompetition::class)
+            robot.outtake.debugLifterPower = -1.0
+        } else {
+            robot.outtake.tick(dt)
+        }
 
         withControlStatus {
             ln("intake", intakeX)

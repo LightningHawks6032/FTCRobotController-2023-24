@@ -106,7 +106,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     )
     private val outtakeRef = ArBotOuttake(
             true,
-            tiltServoRange = DelegateRange(-0.25, 0.2),
+            tiltServoRange = DelegateRange(0.2, 0.5),
             dropServoRange = DelegateRange(0.0, 0.5),
             45.0,
             PID1D.Coefficients(
@@ -119,7 +119,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
             )
     )
     private val planeLauncherRef = ArBotPlaneLauncher(
-            servoRange = DelegateRange(-1.0, 1.0),
+            servoRange = DelegateRange(0.8, -0.1),
     )
 
 
