@@ -42,6 +42,12 @@ suspend fun <R: Any> LOpMode<R>.RunScope.promptSelectAlliance(): Alliance {
     }
 
     untilSelectedLock.wait()
+    val allianceSelected =  alliance ?: throw Error("ALLIANCE WAS NOT SELECTED")
 
-    return alliance ?: throw Error("ALLIANCE WAS NOT SELECTED")
+    withTelemetry {
+        ln("Selected ${allianceSelected.allianceName()} alliance.")
+        ln("Locked in.")
+    }
+
+    return allianceSelected
 }
