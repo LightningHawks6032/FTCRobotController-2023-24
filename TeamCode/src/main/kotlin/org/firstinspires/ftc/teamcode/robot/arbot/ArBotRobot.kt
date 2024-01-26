@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.arbot
 import org.firstinspires.ftc.teamcode.LOpMode
 import org.firstinspires.ftc.teamcode.controlSystems.DriveController
 import org.firstinspires.ftc.teamcode.controlSystems.PID1D
+import org.firstinspires.ftc.teamcode.controlSystems.SemiAuto
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
 import org.firstinspires.ftc.teamcode.ftcGlue.IRobot
 import org.firstinspires.ftc.teamcode.hardware.Motor
@@ -125,6 +126,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     )
     private val underPixelRef = ArBotUnderPixel(
             servoRange = DelegateRange(-0.1, -0.8),
+            locationOnRobot = Vec2(7.0, 5.0)
     )
 
 
@@ -158,6 +160,17 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
                     Vec2Rot(7.0, 7.0,8.0),
             )
         }
+
+        val semiAuto by lazy { SemiAuto(
+                drive,
+                SemiAuto::centerStageObstacleSDF,
+                SemiAuto.ReactionConfig(
+                        robotMass = 20.0,
+                        3.0,
+                        1.0,
+                        5.0
+                ),
+        ) }
 
         val intake = intakeRef.Impl(hardwareMap)
         val outtake = outtakeRef.Impl(hardwareMap)

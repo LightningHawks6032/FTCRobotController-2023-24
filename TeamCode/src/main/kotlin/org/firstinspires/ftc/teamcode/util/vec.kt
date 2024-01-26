@@ -19,13 +19,18 @@ data class Vec2(
     /** Take the dot product between `this` and `other`. */
     infix fun dot(other: Vec2) = this.x * other.x + this.y * other.y
 
+    /** Take the "cross product" between `this` and `other`, which isn't technically a cross product,
+     * but it does basically the same thing in a sense. */
+    infix fun fakeCrossProduct(other: Vec2) = this.x * other.y - this.y * other.x
+
     val magSq get() = this dot this
     val mag get() = sqrt(magSq)
-    val norm get() = if (magSq < 1e-10) {
-        zero
-    } else {
-        this / mag
-    }
+    val norm
+        get() = if (magSq < 1e-10) {
+            zero
+        } else {
+            this / mag
+        }
 
     /**
      * Return a rotated `Vec2`.
@@ -40,6 +45,13 @@ data class Vec2(
 
     companion object {
         val zero = Vec2(0.0, 0.0)
+        val X = Vec2(1.0, 0.0)
+        val Y = Vec2(0.0, 1.0)
+
+        fun grad(f: (Vec2) -> Double, pos: Vec2, dr: Double = 0.1) = Vec2(
+                (f(pos + X * dr / 2.0) - f(pos - X * dr / 2.0)) / dr * 2,
+                (f(pos + Y * dr / 2.0) - f(pos - Y * dr / 2.0)) / dr,
+        )
     }
 }
 
@@ -125,7 +137,7 @@ data class Vec3(
 
     companion object {
         val zero = Vec3(0.0, 0.0, 0.0)
-        val zVec = Vec3(0.0,0.0, 1.0)
+        val zVec = Vec3(0.0, 0.0, 1.0)
     }
 }
 

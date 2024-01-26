@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.controlSystems.ActionSequence
 import org.firstinspires.ftc.teamcode.util.CubicBezier
 import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
+import kotlin.math.max
 
 class MotionPathBuilder(
         startPos: Vec2Rot,
@@ -17,6 +18,7 @@ class MotionPathBuilder(
     private var lastVelXY = startVel.v
     private val pathsR = mutableListOf<MotionPath<Double>>()
     private var tEndR = 0.0
+    private var tMark = 0.0
     private var lastPosR = startPos.r
     private var lastVelR = startVel.r
 
@@ -28,6 +30,10 @@ class MotionPathBuilder(
         val lastVel get() = Vec2Rot(lastVelXY, lastVelR)
         fun actAt(time: TimeWithUnits, action: () -> Unit) {
             val t = time.seconds
+            actions.add(Pair(t, action))
+        }
+        fun actAtTSinceMark(time: TimeWithUnits, action: () -> Unit) {
+            val t = time.seconds + tMark
             actions.add(Pair(t, action))
         }
 
@@ -53,6 +59,14 @@ class MotionPathBuilder(
                 addXY(StationaryMotionPath.TVec2(lastPosXY, t - tEndXY))
             if (t > tEndR)
                 addR(StationaryMotionPath.TDouble(lastPosR, t - tEndR))
+        }
+        fun stationaryLasting(t: TimeWithUnits) {
+            val t2 = max(tEndXY + t.seconds, tEndR + t.seconds)
+            stationaryUntilAt(t2.seconds)
+        }
+        fun mark() {
+            stationaryLasting(0.0.seconds) // equalize tEndXY and tEndR
+            tMark = tEndXY
         }
 
         fun stationaryXY(time: EventTime) {
@@ -99,6 +113,10 @@ class MotionPathBuilder(
         inner class UntilAt(private val timeAt: TimeWithUnits) : EventTime {
             override fun durationSecondsFromNow(nowSeconds: Double) =
                     timeAt.seconds - nowSeconds
+        }
+        inner class UntilSinceMark(private val timeAt: TimeWithUnits) : EventTime {
+            override fun durationSecondsFromNow(nowSeconds: Double) =
+                    timeAt.seconds + tMark - nowSeconds
         }
     }
 

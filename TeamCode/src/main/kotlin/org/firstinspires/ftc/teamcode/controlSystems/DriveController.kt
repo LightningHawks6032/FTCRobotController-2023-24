@@ -103,6 +103,7 @@ class DriveController(
 
     fun shutdownOutput() {
         output.power = Vec2Rot.zero
+        disableTicking = true
     }
 
     class Control(

@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.vision.VisProcessor
 import org.firstinspires.ftc.vision.VisionProcessor
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import kotlin.math.max
 
 class TeamPropVisProcessor(
         alliance: Alliance,
@@ -26,7 +27,7 @@ class TeamPropVisProcessor(
         Alliance.Blue -> DetectColorRange(
                 centerHue = 215.0,
                 hueThreshold = 120.0,
-                minSaturation = 30.0,
+                minSaturation = 0.0,
                 minValue = 30.0,
         )
     }
@@ -34,10 +35,12 @@ class TeamPropVisProcessor(
     /** A list of labelled sections of the texture to look for the Team Prop in. */
     private val regions = arrayOf(
             // (0.0, 0.0) is top left, (1.0, 1.0) is bottom right
-            Region(Loc.Left, x = 0.0 to 0.2, y = 0.4 to 0.6),
-            Region(Loc.Center, x = 0.4 to 0.6, y = 0.4 to 0.6),
-            Region(Loc.Right, x = 0.8 to 1.0, y = 0.4 to 0.6),
+            Region(Loc.Left, x = 0.0 to 0.20, y = 0.4 to 0.6),
+            Region(Loc.Center, x = 0.45 to 0.60, y = 0.4 to 0.6),
+//            Region(Loc.Right, x = 0.95 to 1.0, y = 0.4 to 0.6),
     )
+    private val wholeRegion = Region(Loc.Right, x = 0.0 to 0.8, y = 0.4 to 0.6)
+    private val noDetectDefaultRegion = Loc.Right
 
     /** The location on the field the Team Prop is in, as measured by this processor. */
     var location = Loc.Center
@@ -55,11 +58,16 @@ class TeamPropVisProcessor(
         // Write to [filtered], making it white wherever the hue, saturation, and value are correct.
         Imgproc.cvtColor(input, filtered, Imgproc.COLOR_RGB2HSV)
         Core.inRange(filtered, detectColorRange.lower, detectColorRange.upper, filtered)
+        filtered.copyTo(input)
 
         // Pass this filtered image to the regions, selecting the one with the highest score
-        location = regions.maxBy { region ->
-            region.evalObjectProbability(filtered)
-        }.loc
+        val scored = regions.map { Pair(it, it.evalObjectProbability(filtered)) }
+        println("scores ${scored.map { it.second }}")
+        location = if (scored.maxOf { (_, score) -> score } > max(60.0, -10 + 2.0 * ( 10 + scored.minOf { (_, score) -> score }))) {
+            scored.maxBy { (_, score) -> score }.first.loc
+        } else {
+            noDetectDefaultRegion
+        }
 
         return filtered
     }

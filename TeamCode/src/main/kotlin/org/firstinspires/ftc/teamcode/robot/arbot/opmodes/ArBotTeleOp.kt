@@ -72,7 +72,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
         robot.outtake.dropOpen = gamepadB.a.isHeld
         // reset slide position
-        if (gamepadB.y.isHeld) {
+        if (gamepadB.y.isHeld && outtakeX < 4.0) {
             robot.outtake.pos = 0.0
             @OptIn(NotForCompetition::class)
             robot.outtake.debugLifterPower = -1.0
@@ -103,22 +103,23 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 y = gamepadA.trigger.let { it.left - it.right },
                 r = -gamepadA.stick.right.pos.x,
         ).transformP { it.rotate(robot.drive.inputPos.r) }
-        val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
-
-        pos += (vel * dt).transformP { (x, y) -> Vec2(x.coerceIn(-1.0, 1.0), y.coerceIn(-1.0, 1.0)) }
-//        pos = pos.transformP { (x,y) ->
-//            val radius = 9.0 * (cos(abs((abs(pos.r)%(PI/2))-PI/4))) * sqrt(0.5)
-//            Vec2(
-//                x.coerceIn(POIs.fieldBounds.x.first + radius, POIs.fieldBounds.x.second - radius),
-//                y.coerceIn(POIs.fieldBounds.y.first + radius, POIs.fieldBounds.y.second - radius),
-//            )
-//        }.let {
-//            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
-//        }
-
-        robot.drive.setPowerAndTrack(input.componentwiseTimes(Vec2Rot(1.0, 1.0, 0.5)), dt)
-//        robot.drive.targetPos = pos
-//        robot.drive.tick(dt)
+//        val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
+//
+//        pos += (vel * dt).transformP { (x, y) -> Vec2(x.coerceIn(-1.0, 1.0), y.coerceIn(-1.0, 1.0)) }
+////        pos = pos.transformP { (x,y) ->
+////            val radius = 9.0 * (cos(abs((abs(pos.r)%(PI/2))-PI/4))) * sqrt(0.5)
+////            Vec2(
+////                x.coerceIn(POIs.fieldBounds.x.first + radius, POIs.fieldBounds.x.second - radius),
+////                y.coerceIn(POIs.fieldBounds.y.first + radius, POIs.fieldBounds.y.second - radius),
+////            )
+////        }.let {
+////            POIs.coerceOutOfDangerZone(pos, robot.drive.inputVel)
+////        }
+//
+//        robot.drive.setPowerAndTrack(input.componentwiseTimes(Vec2Rot(1.0, 1.0, 0.5)), dt)
+////        robot.drive.targetPos = pos
+////        robot.drive.tick(dt)
+        robot.semiAuto.tick(dt, input)
 
         withDriveStatus {
             robot.drive.writeTelemetry(this)
