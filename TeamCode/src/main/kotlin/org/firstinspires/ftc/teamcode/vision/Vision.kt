@@ -9,7 +9,7 @@ class Vision(val webcamId: String) {
 
 
     inner class Impl(hardwareMap: IHardwareMap) {
-        private val camera = hardwareMap.getRaw(webcamId, CameraName::class) ?: TODO("not found")
+        private val camera = hardwareMap.getRaw(webcamId, CameraName::class) ?: TODO("camera '$webcamId' not found")
 
         /**
          * Creates a VisionPortal using the builder.

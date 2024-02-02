@@ -23,6 +23,12 @@ class DriveController(
         return Pair(input, output)
     }
 
+    private var deactivateOutput = false
+    @NotForCompetition
+    fun debugDeactivateOutput() {
+        deactivateOutput = true
+    }
+
     private var disableTicking = false
 
     val inputPos get() = input.pos
@@ -59,6 +65,11 @@ class DriveController(
         t += dt
         input.tick(dt)
 
+        if (deactivateOutput) { // disables output when [debugDeactivateOutput]
+            output.power = Vec2Rot.zero
+            return
+        }
+
         val robot2world = input.robot2worldTransform()
         output.setForce(
                 forceMagnitude componentwiseTimes
@@ -84,6 +95,11 @@ class DriveController(
         val target = path?.sampleClamped(t)
                 ?: MotionPath.PathPoint(targetPos, Vec2Rot.zero, Vec2Rot.zero)
         targetPos = target.pos // save so robot stays in place when [path] is deleted
+
+        if (deactivateOutput) { // disables output when [debugDeactivateOutput]
+            output.power = Vec2Rot.zero
+            return
+        }
 
         val pow = pid.tick(
                 input.pos, input.vel,

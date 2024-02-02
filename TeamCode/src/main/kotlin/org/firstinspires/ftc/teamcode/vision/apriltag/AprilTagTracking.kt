@@ -117,6 +117,7 @@ class AprilTagTracking(
     inner class Odometry() : IOdometry() {
         private var dtAccumulated = 0.0
         private var odoUpdatedN = 0
+        private var hasPosition = false
 
         override fun tick(dt: Double) {
             dtAccumulated += dt
@@ -125,7 +126,8 @@ class AprilTagTracking(
 
 
             val estimates = cameras.flatMap { it.botPosEstimates }
-            if (estimates.isEmpty()) return
+            hasPosition = estimates.isNotEmpty()
+            if (!hasPosition) return
 
             val lastPos = pos
             // Position should be the weighted average of all the
@@ -136,9 +138,11 @@ class AprilTagTracking(
             val lastVel = vel
             vel = (pos - lastPos) / dtAccumulated
             acc = (vel - lastVel) / dtAccumulated
+
+//            println("TICKING APRIL TAG ODOMETRY, $odoUpdatedN, ${estimates.size}, ${hasPositionInfo()}")
         }
 
-        override fun hasPositionInfo() = cameras.any { it.hasPosition }
+        override fun hasPositionInfo() = hasPosition
 
         override fun assertPosition(newPos: Vec2Rot) {
             pos = newPos

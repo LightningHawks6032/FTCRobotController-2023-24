@@ -183,7 +183,7 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
         ) {
             for ((cam, aprilTag) in listOf(
                     Pair(cam0, aprilTagCam0),
-                    Pair(cam1, aprilTagCam1),
+//                    Pair(cam1, aprilTagCam1),
             )) {
                 scope.createVisionLoop(cam, listOf(aprilTag), condition = condition) {
                     aprilTag.updateEstimates(odometry.pos)
