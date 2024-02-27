@@ -36,6 +36,7 @@ class DriveController(
 
     var path: MotionPath<Vec2Rot>? = null
     var targetPos: Vec2Rot = input.pos
+    var lastTargetPos: Vec2Rot = input.pos
 
     fun assertPosition(pos: Vec2Rot) {
         input.assertPosition(pos)
@@ -93,7 +94,8 @@ class DriveController(
         input.tick(dt)
 
         val target = path?.sampleClamped(t)
-                ?: MotionPath.PathPoint(targetPos, Vec2Rot.zero, Vec2Rot.zero)
+                ?: MotionPath.PathPoint(targetPos, (targetPos - lastTargetPos) * (1.0 / dt), Vec2Rot.zero)
+        lastTargetPos = targetPos
         targetPos = target.pos // save so robot stays in place when [path] is deleted
 
         if (deactivateOutput) { // disables output when [debugDeactivateOutput]

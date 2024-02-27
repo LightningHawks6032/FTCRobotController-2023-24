@@ -47,7 +47,7 @@ object Durabot2Robot : IRobot<Durabot2Robot.Impl> {
                             bias = 0.05,
                             biasSlope = 1.5,
                     ),
-                    Vec2Rot(7.0, 7.0, 8.0),
+                    Vec2Rot(5.0, 5.0, 0.5),
             )
         }
     }

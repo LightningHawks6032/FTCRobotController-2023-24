@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.motion
 
 import org.firstinspires.ftc.teamcode.ftcGlue.IHardwareMap
+import org.firstinspires.ftc.teamcode.util.CM_TO_IN
 import org.firstinspires.ftc.teamcode.util.DeltaValue
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import kotlin.math.cos
@@ -60,10 +61,10 @@ class MecanumWheelOdometry(
 
         /** Get the estimated change in position in robot local space. */
         fun readDelta(): Vec2Rot {
-            val fl = deltaFL * mecanumDrive.wheelRadius
-            val fr = deltaFR * mecanumDrive.wheelRadius
-            val bl = deltaBL * mecanumDrive.wheelRadius
-            val br = deltaBR * mecanumDrive.wheelRadius
+            val fl = deltaFL * mecanumDrive.wheelRadius * CM_TO_IN
+            val fr = deltaFR * mecanumDrive.wheelRadius * CM_TO_IN
+            val bl = deltaBL * mecanumDrive.wheelRadius * CM_TO_IN
+            val br = deltaBR * mecanumDrive.wheelRadius * CM_TO_IN
             val k = cos(wheelAngleOffPerp) / mecanumDrive.wheelDisplacement
 
             // let R = r * k
@@ -76,9 +77,9 @@ class MecanumWheelOdometry(
             // (fl - bl)/2 = (br - fr)/2 = x
             // (br - fl)/2 = (fr - bl)/2 = R
 
-            val deltaY = (fl+fr+bl+br)/4
-            val deltaX = (fl + br - fr - bl)/4
-            val deltaR = (fr + br - fl - bl)/4 * mecanumDrive.wheelDisplacement / cos(wheelAngleOffPerp)
+            val deltaY = (fl + fr + bl + br) / 4
+            val deltaX = (fl + br - fr - bl) / 4
+            val deltaR = (fr + br - fl - bl) / 4 * mecanumDrive.wheelDisplacement * cos(wheelAngleOffPerp)
             return mecanumDrive.assembly2robotTransform.transformVelFwd(
                     Vec2Rot(deltaX, deltaY, deltaR)
             )
