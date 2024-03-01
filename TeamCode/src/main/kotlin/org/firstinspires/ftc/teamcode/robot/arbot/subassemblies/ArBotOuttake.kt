@@ -12,7 +12,7 @@ private const val IN_PER_RAD_OUTTAKE_SLIDES = 1.0 // TODO
 
 class ArBotOuttake(
         doReverse: Boolean = false,
-        private val tiltServoRange: DelegateRange,
+//        private val tiltServoRange: DelegateRange,
         private val dropServoRange: DelegateRange,
         val forceScale: Double,
         private val pidCoefficients: PID1D.Coefficients,
@@ -27,14 +27,14 @@ class ArBotOuttake(
                 minTorque = 2.0
             }),
     )
-    private val tiltServoRef = Servo("t", continuousRotation = false, Servo.Config { reversed = false })
+//    private val tiltServoRef = Servo("t", continuousRotation = false, Servo.Config { reversed = false })
     private val dropServoRef = Servo("d", continuousRotation = false, Servo.Config { reversed = true })
 
     private var outtakeTilt = false
 
     inner class Impl(hardwareMap: IHardwareMap) {
         private val lifter = lifterRef.Impl(hardwareMap)
-        private val tiltServo = tiltServoRef.Impl(hardwareMap)
+//        private val tiltServo = tiltServoRef.Impl(hardwareMap)
         private val dropServo = dropServoRef.Impl(hardwareMap)
 
         private fun onEditZeroPos(it: ()->Unit) {
@@ -57,16 +57,16 @@ class ArBotOuttake(
             println("pos $pos, target ${controller.targetPosition}")
         }
 
-        private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
+//        private var tiltServoPos by tiltServo::pos.delegate().remapRange(tiltServoRange, DelegateRange(-1.0,1.0))
         private var dropServoPos by dropServo::pos.delegate().remapRange(dropServoRange, DelegateRange(-1.0,1.0))
-        var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { tilt ->
-            tiltServoPos = if (tilt) 1.0 else -0.8
-        }
+//        var outtakeTilt by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { tilt ->
+//            tiltServoPos = if (tilt) 1.0 else -0.8
+//        }
         var dropOpen by this@ArBotOuttake::outtakeTilt.delegate().withAfterWriteEffect { open ->
             dropServoPos = if (open) 1.0 else -1.0
         }
-        @NotForCompetition
-        fun debugControlTiltServo() = tiltServo
+//        @NotForCompetition
+//        fun debugControlTiltServo() = tiltServo
         @NotForCompetition
         fun debugControlDropServo() = dropServo
         @NotForCompetition

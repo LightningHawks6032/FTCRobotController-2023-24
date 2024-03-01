@@ -14,7 +14,7 @@ private val POIs = FTCCenterStagePOIs
 class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val outtakeArmMaxHeight = 36.0
     robot.outtake.pos = 0.0
-    robot.intake.pos = 0.0 // assert that we start here
+//    robot.intake.pos = 0.0 // assert that we start here
 
 //    selectDebugBool("switch_control_scheme")
 //    val switchControlScheme = DebugVars.bool["switch_control_scheme"] ?: false
@@ -38,13 +38,13 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         robot.planeLauncher.launch = gamepadB.b.isHeld
 
         // ---------- INTAKE ----------- //
-        /// Intake velocity (positive -> down)
-        val intakeV = gamepadB.trigger.let { it.left - it.right } * slowMultiplierB
-        var intakeX by robot.intake.angleController::targetPosition
-        intakeX = (intakeX + dt * intakeV).clamp(-PI / 2, 0.0)
-//        robot.intake.tick(dt)
-        @OptIn(NotForCompetition::class)
-        robot.intake.debugAnglePower = intakeV
+//        /// Intake velocity (positive -> down)
+//        val intakeV = gamepadB.trigger.let { it.left - it.right } * slowMultiplierB
+//        var intakeX by robot.intake.angleController::targetPosition
+//        intakeX = (intakeX + dt * intakeV).clamp(-PI / 2, 0.0)
+////        robot.intake.tick(dt)
+//        @OptIn(NotForCompetition::class)
+//        robot.intake.debugAnglePower = intakeV
 
         robot.intake.spinPower = gamepadB.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
 
@@ -59,17 +59,17 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             outtakeV = -2.0
         }
         outtakeX = (outtakeX + dt * outtakeV).clamp(0.0, outtakeArmMaxHeight)
-        watches(gamepadB.x::Watch) {
-            it.pressed.bind {
-                robot.outtake.outtakeTilt = !robot.outtake.outtakeTilt
-            }
-        }
+//        watches(gamepadB.x::Watch) {
+//            it.pressed.bind {
+//                robot.outtake.outtakeTilt = !robot.outtake.outtakeTilt
+//            }
+//        }
 
         // Force-close the outtake box under a certain point to avoid damage.
         // (if expected position 0.5 seconds in the future is less than 10in)
-        if (outtakeX + outtakeV * 0.5 < 10.0) {
-            robot.outtake.outtakeTilt = false
-        }
+//        if (outtakeX + outtakeV * 0.5 < 10.0) {
+//            robot.outtake.outtakeTilt = false
+//        }
         robot.outtake.dropOpen = gamepadB.a.isHeld
         // reset slide position
         if (gamepadB.y.isHeld && outtakeX < 4.0) {
@@ -81,7 +81,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
 
         withControlStatus {
-            ln("intake", intakeX)
+//            ln("intake", intakeX)
             ln("outtake", outtakeX)
             ln("launch", robot.planeLauncher.launch)
         }

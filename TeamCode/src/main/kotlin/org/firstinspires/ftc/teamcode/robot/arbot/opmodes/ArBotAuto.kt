@@ -81,7 +81,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             robot.outtake.controller.path = BezierMotionPath.TDouble(
                     CubicBezier.forEndpointTangents(3.0, 0.0, 0.0, 30.0, 0.0)
             )
-            robot.outtake.outtakeTilt = true
+//            robot.outtake.outtakeTilt = true
         }
 
         // drop held pixels
@@ -92,7 +92,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
         // retract outtake
         actAtTSinceMark(4.0.seconds) {
-            robot.outtake.outtakeTilt = false
+//            robot.outtake.outtakeTilt = false
             robot.outtake.dropOpen = false
             robot.outtake.controller.path = BezierMotionPath.TDouble(
                     CubicBezier.forEndpointTangents(4.0, 30.0, 0.0, 0.0, 0.0)
@@ -119,7 +119,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         actionExecutor.tick(dt)
         robot.drive.tick(dt)
         robot.outtake.tick(dt)
-        robot.intake.tick(dt)
+//        robot.intake.tick(dt)
         withTelemetry {
             robot.drive.writeTelemetry(this)
         }

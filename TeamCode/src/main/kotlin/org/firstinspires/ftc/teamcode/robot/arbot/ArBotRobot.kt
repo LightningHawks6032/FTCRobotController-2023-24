@@ -28,18 +28,18 @@ KEY: `CH[3]` &rarr; Control Hub Port 3, `EH[0]` &rarr; Expansion Hub Port 0
 
 DCMotor Mappings:
 - "fr" (`CH[2]`): front right drive motor, front odometry wheel
-- "fl" (`CH[3]`): front left drive motor, left odometry wheel
+- "fl" (`EH[1]`): front left drive motor, left odometry wheel
 - "br" (`CH[1]`): back right drive motor, right odometry wheel
-- "bl" (`CH[0]`): back left drive motor
+- "bl" (`EH[0]): back left drive motor
 
-- "s": (`EH[0]`) intake high speed spinner motor
-- "a": (`EH[1]`) intake arm angle motor
+- "s": (`EH[2]`) intake high speed spinner motor
+//- "a": (`EH[1]`) intake arm angle motor
 
-- "l0": (`EH[2]`) out take lifter linear slide motor
+- "l0": (`CH[3]`) out take lifter linear slide motor
 - "l1": (`EH[3]`) out take lifter linear slide motor (the other one)
 
 Servo Mappings:
-- "t" (`CH[0]`): outtake tilt angle servo
+//- "t" (`CH[0]`): outtake tilt angle servo
 - "d" (`CH[1]`): outtake drop servo
 
 
@@ -109,8 +109,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     )
     private val outtakeRef = ArBotOuttake(
             true,
-            tiltServoRange = DelegateRange(0.2, 0.5),
-            dropServoRange = DelegateRange(0.0, 0.5),
+//            tiltServoRange = DelegateRange(0.2, 0.5),
+            dropServoRange = DelegateRange(0.0, 1.0),
             45.0,
             PID1D.Coefficients(
                     P = 0.5,

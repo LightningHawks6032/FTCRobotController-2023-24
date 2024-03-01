@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.util.NotForCompetition
 @NotForCompetition
 @TeleOp(name = "TestIntakeAndOuttake", group = OpGroupName.DEBUGGING)
 class ArBotTestIntakeAndOuttakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
-    robot.intake.pos = 0.0
+//    robot.intake.pos = 0.0
 
     robot.outtake.pos = 0.0
 
@@ -17,11 +17,11 @@ class ArBotTestIntakeAndOuttakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     createLoop {
         /// intake
-        if (gamepadA.a.isHeld) {
-            robot.intake.tick(dt)
-        } else {
-            robot.intake.debugAnglePower = 0.0
-        }
+//        if (gamepadA.a.isHeld) {
+//            robot.intake.tick(dt)
+//        } else {
+//            robot.intake.debugAnglePower = 0.0
+//        }
         if (gamepadA.b.isHeld) {
             robot.outtake.tick(dt)
         } else {
@@ -29,7 +29,7 @@ class ArBotTestIntakeAndOuttakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
 
         val intakeTarget = gamepadA.stick.left.pos.x
-        robot.intake.angleController.targetPosition = intakeTarget
+//        robot.intake.angleController.targetPosition = intakeTarget
 
         val spinPower = gamepadA.stick.right.pos.x
         robot.intake.spinPower = spinPower
@@ -40,7 +40,7 @@ class ArBotTestIntakeAndOuttakeOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
         val outtakeTilt = gamepadA.x.isHeld
         val outtakeDrop = gamepadA.y.isHeld
-        robot.outtake.outtakeTilt = outtakeTilt
+//        robot.outtake.outtakeTilt = outtakeTilt
         robot.outtake.dropOpen = outtakeDrop
 
         withTelemetry {
