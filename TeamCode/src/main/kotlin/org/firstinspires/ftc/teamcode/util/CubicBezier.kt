@@ -84,7 +84,7 @@ abstract class CubicBezier<T>(
                         domainLen,
                         pa,
                         pa + (va / 3.0) * domainLen,
-                        pa - (vb / 3.0) * domainLen,
+                        pb - (vb / 3.0) * domainLen,
                         pb,
                 )
     }

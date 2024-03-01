@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.controlSystems
 
+import org.firstinspires.ftc.teamcode.controlSystems.motionPath.BezierMotionPath
 import org.firstinspires.ftc.teamcode.controlSystems.motionPath.MotionPath
 import org.firstinspires.ftc.teamcode.hardware.Motor
+import org.firstinspires.ftc.teamcode.util.CubicBezier
 import kotlin.reflect.KProperty0
 
 class ActuatorPositionController(
@@ -37,6 +39,13 @@ class ActuatorPositionController(
         }
     var targetPosition = posGen.x
 
+    fun automatedGoToExtension(duration: Double, toHeight: Double) {
+        path = BezierMotionPath.TDouble(CubicBezier.forEndpointTangents(
+                duration,
+                targetPosition, posGen.v,
+                toHeight, 0.0,
+        ))
+    }
 
     private var t = 0.0
     fun tick(dt: Double, shutdownIf: (Double, Double) -> Boolean = { _, _ -> false }) {
