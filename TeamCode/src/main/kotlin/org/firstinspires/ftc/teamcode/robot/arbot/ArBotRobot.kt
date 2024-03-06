@@ -10,10 +10,7 @@ import org.firstinspires.ftc.teamcode.hardware.Motor
 import org.firstinspires.ftc.teamcode.hardware.motion.CompoundOdometry
 import org.firstinspires.ftc.teamcode.hardware.motion.MecanumDrive
 import org.firstinspires.ftc.teamcode.hardware.motion.ThreeWheelOdometry
-import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotIntake
-import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotOuttake
-import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotPlaneLauncher
-import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.ArBotUnderPixel
+import org.firstinspires.ftc.teamcode.robot.arbot.subassemblies.*
 import org.firstinspires.ftc.teamcode.util.*
 import org.firstinspires.ftc.teamcode.vision.Vision
 import org.firstinspires.ftc.teamcode.vision.apriltag.AprilTagInfoBuilder
@@ -124,10 +121,11 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
     private val planeLauncherRef = ArBotPlaneLauncher(
             servoRange = DelegateRange(0.8, -0.1),
     )
-    private val underPixelRef = ArBotUnderPixel(
-            servoRange = DelegateRange(-0.1, -0.8),
+    private val groundPixelRef = ArBotGroundPixel(
+            servoRange = DelegateRange(1.0, 0.0),
             locationOnRobot = Vec2(7.0, 5.0)
     )
+    private val lifterRef = ArBotLifter()
 
 
     class Impl(hardwareMap: IHardwareMap) {
@@ -175,7 +173,8 @@ object ArBotRobot : IRobot<ArBotRobot.Impl> {
         val intake = intakeRef.Impl(hardwareMap)
         val outtake = outtakeRef.Impl(hardwareMap)
         val planeLauncher = planeLauncherRef.Impl(hardwareMap)
-        val underPixel = underPixelRef.Impl(hardwareMap)
+        val groundPixel = groundPixelRef.Impl(hardwareMap)
+        val lifter = lifterRef.Impl(hardwareMap)
 
         suspend fun createAprilTagVisionLoops(
                 scope: LOpMode<Impl>.RunScope,

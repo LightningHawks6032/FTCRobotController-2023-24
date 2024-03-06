@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.util.remapRange
 class ArBotPlaneLauncher(
         private val servoRange: DelegateRange,
 ) {
-    private val servoRef = Servo("c", continuousRotation = false, Servo.Config { reversed = false })
+    private val servoRef = Servo("plane", continuousRotation = false, Servo.Config { reversed = false })
 
     inner class Impl(hardwareMap: IHardwareMap) {
         private val servo = servoRef.Impl(hardwareMap)

@@ -34,6 +34,10 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         val slowMultiplierB = if (slowB) 0.3 else 1.0
         // thing controls
 
+        // ---------- SUSPEND ----------- //
+        robot.lifter.raiseArm = gamepadA.dpad.let { (if (it.right.isHeld) 1.0 else 0.0) - (if (it.left.isHeld) 1.0 else 0.0) }
+        robot.lifter.liftPower = gamepadA.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
+
         // ---------- PLANES ----------- //
         robot.planeLauncher.launch = gamepadB.b.isHeld
 
@@ -80,6 +84,8 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             robot.outtake.tick(dt)
         }
 
+        robot.groundPixel.hold = !gamepadA.y.isHeld
+
         withControlStatus {
 //            ln("intake", intakeX)
             ln("outtake", outtakeX)
@@ -93,7 +99,8 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     createLoop {
         /// drive
-        val slow = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
+        val slow = gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
+        val speedFactor = if (slow) 0.3 else 1.0
         val speedLinear = if (slow) 12.0 else 36.0
         val speedAngular = if (slow) PI / 2 else PI
 
@@ -102,7 +109,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 x = -gamepadA.stick.left.pos.y,
                 y = gamepadA.trigger.let { it.left - it.right },
                 r = -gamepadA.stick.right.pos.x,
-        ).transformP { it.rotate(robot.drive.inputPos.r) }
+        ).transformP { it.rotate(robot.drive.inputPos.r) } * speedFactor
 //        val vel = input.componentwiseTimes(Vec2Rot(speedLinear, speedLinear, speedAngular))
 //
 //        pos += (vel * dt).transformP { (x, y) -> Vec2(x.coerceIn(-1.0, 1.0), y.coerceIn(-1.0, 1.0)) }

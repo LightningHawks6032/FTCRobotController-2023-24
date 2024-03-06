@@ -95,6 +95,7 @@ class DriveController(
 
         val target = path?.sampleClamped(t)
                 ?: MotionPath.PathPoint(targetPos, (targetPos - lastTargetPos) * (1.0 / dt), Vec2Rot.zero)
+        println("$t\t${input.pos.v.x}\t${input.pos.v.y}\t${input.pos.r}\t${target.pos.v.x}\t${target.pos.v.y}\t${target.pos.r}")
         lastTargetPos = targetPos
         targetPos = target.pos // save so robot stays in place when [path] is deleted
 

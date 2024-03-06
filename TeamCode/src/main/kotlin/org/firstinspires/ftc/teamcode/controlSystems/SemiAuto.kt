@@ -59,6 +59,7 @@ class SemiAuto(
     }
 
     private fun calculateObjectAvoidanceForce(): Vec2Rot {
+        return Vec2Rot.zero
         var objectAvoidanceForce = Vec2Rot.zero
         var facTotal = 0.001
         val count = 18

@@ -28,7 +28,7 @@ class ArBotOuttake(
             }),
     )
 //    private val tiltServoRef = Servo("t", continuousRotation = false, Servo.Config { reversed = false })
-    private val dropServoRef = Servo("d", continuousRotation = false, Servo.Config { reversed = true })
+    private val dropServoRef = Servo("drop", continuousRotation = false, Servo.Config { reversed = true })
 
     private var outtakeTilt = false
 

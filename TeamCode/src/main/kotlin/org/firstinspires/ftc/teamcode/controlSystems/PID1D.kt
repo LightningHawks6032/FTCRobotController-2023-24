@@ -16,6 +16,8 @@ class PID1D(val coefficients: Coefficients) {
         xOffAccumulation *= exp(-decay * dt)
         xOffAccumulation += (tx - cx) * dt
 
+        println("P: ${tx-cx} I: $xOffAccumulation D: ${tv-cv}")
+
         return (P*(tx-cx) + I*xOffAccumulation + D*(tv-cv)).let {
             it + tanh(it * coefficients.biasSlope) * coefficients.bias
         }

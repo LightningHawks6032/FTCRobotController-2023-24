@@ -20,7 +20,7 @@ private val POIs = FTCCenterStagePOIs
 
 @Autonomous
 class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
-    robot.underPixel.hold = true
+    robot.groundPixel.hold = true
 
     val alliance = promptSelectAlliance()
     var detectedLoc = Center
@@ -59,28 +59,28 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         if (detectedLoc == Center) {
             // towards the opponent
             bezierR(UntilSinceMark(1.0.seconds), FTCCenterStagePOIs.Facing.Self.angle(alliance))
-            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 12.0, 48.0 - 9.0))
-            groundPlacingDelay = 1.0.seconds
-            stationaryLasting(0.25.seconds)
-            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 12.0, 48.0 - 9.0 - 6.0))
+            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 12.0, 48.0 - 9.0 + 3.5))
+            groundPlacingDelay = 1.5.seconds
+            stationaryLasting(1.0.seconds)
+            bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 15.0, 48.0 - 9.0 - 6.0))
         } else if ((detectedLoc == Right) == (alliance == Alliance.Red)) {
             // towards the pixel board
             bezierR(UntilSinceMark(2.0.seconds), FTCCenterStagePOIs.Facing.Forwards.angle(alliance))
-            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0, 36.0 + 6.0))
-            groundPlacingDelay = 2.0.seconds
-            stationaryLasting(0.25.seconds)
-            bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 + 3.0, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 - 3.5, 36.0 + 6.0))
+            groundPlacingDelay = 2.5.seconds
+            stationaryLasting(1.0.seconds)
+            bezierXY(UntilSinceMark(4.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 + 3.0, 36.0 + 6.0))
         } else {
             // towards the audience
             bezierR(UntilSinceMark(1.0.seconds), FTCCenterStagePOIs.Facing.Forwards.angle(alliance))
-            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0, 36.0 + 6.0))
-            groundPlacingDelay = 1.0.seconds
-            stationaryLasting(0.25.seconds)
-            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 + 3.0, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 - 3.5, 36.0 + 6.0))
+            groundPlacingDelay = 1.5.seconds
+            stationaryLasting(1.0.seconds)
+            bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 + 3.0, 36.0 + 6.0))
 
         }
         actAtTSinceMark(groundPlacingDelay) {
-            robot.underPixel.hold = false
+            robot.groundPixel.hold = false
         }
 
 
@@ -88,15 +88,15 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         mark()
 
         val backdropXOff = when (detectedLoc) {
-            Left -> +6.0
-            Center -> 0.0
-            Right -> -6.0
+            Left -> 3.0
+            Center -> -1.0
+            Right -> -7.0
         }
         actAtTSinceMark(0.0.seconds) {
-            robot.outtake.controller.automatedGoToExtension(2.0, 24.0 / cos(40.0 / 180.0 * PI))
+            robot.outtake.controller.automatedGoToExtension(2.0, 18.0 / cos(40.0 / 180.0 * PI))
         }
         bezierR(Lasting(1.0.seconds), 0.0, 0.0)
-        bezierXY(Lasting(2.5.seconds), POIs.facingBackdropFromDistance(alliance, 11.0, strafe = backdropXOff))
+        bezierXY(Lasting(2.5.seconds), POIs.facingBackdropFromDistance(alliance, 9.0, strafe = backdropXOff))
 
 
         // drop held pixels
@@ -121,10 +121,11 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
                 lastPos.v + Vec2(-8.0, 0.0),
                 Vec2(-12.0, 0.0))
         bezierXY(Lasting(2.0.seconds),
-                POIs.relativePos(alliance, 44.0, 14.0),
+                POIs.relativePos(alliance, 44.0, 20.0),
                 POIs.relativeVel(alliance, 10.0, -3.0))
         bezierXY(Lasting(1.5.seconds),
-                POIs.relativePos(alliance, 72.0 - 11.0, 11.0))
+//                POIs.relativePos(alliance, 72.0 - 11.0, 11.0))
+                POIs.relativePos(alliance, 72.0 - 11.0, 17.0))
 
 
         // done, shut down
@@ -135,11 +136,12 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
     }
 
-    robot.createAprilTagVisionLoops(this, condition = { duringRun })
+//    robot.createAprilTagVisionLoops(this, condition = { duringRun })
     createLoop {
-        actionExecutor.tick(dt)
-        robot.drive.tick(dt)
-        robot.outtake.tick(dt)
+        val R = 1.0
+        actionExecutor.tick(dt*R)
+        robot.drive.tick(dt*R)
+        robot.outtake.tick(dt*R)
         withTelemetry {
             robot.drive.writeTelemetry(this)
         }

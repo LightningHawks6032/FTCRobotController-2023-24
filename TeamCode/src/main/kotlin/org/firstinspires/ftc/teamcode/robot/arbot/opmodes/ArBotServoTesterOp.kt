@@ -19,7 +19,7 @@ class ArBotServoTesterOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             robot.outtake.debugControlDropServo(),
 //            robot.outtake.debugControlTiltServo(),
             robot.planeLauncher.debugControlServo(),
-            robot.underPixel.debugControlServo(),
+            robot.groundPixel.debugControlServo(),
     )
     val labels = listOf(
             "outtake-drop",

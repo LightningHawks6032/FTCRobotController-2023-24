@@ -24,7 +24,7 @@ class Servo(
     }
 
     inner class Impl(hardwareMap: IHardwareMap) {
-        private val iServo = hardwareMap.servos[id] ?: TODO("not found")
+        private val iServo = hardwareMap.servos[id] ?: TODO("not found servo '$id'")
 
         private val reverseConst get() = if (reversed) -1.0 else 1.0
 

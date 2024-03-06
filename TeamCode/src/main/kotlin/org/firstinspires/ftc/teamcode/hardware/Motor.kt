@@ -75,7 +75,7 @@ class Motor(
     }
 
     inner class Impl(hardwareMap: IHardwareMap) {
-        private val idcMotor = hardwareMap.dcMotors[id] ?: TODO("not found")
+        private val idcMotor = hardwareMap.dcMotors[id] ?: TODO("not found motor '$id'")
 
         private val reverseConst get() = if (reversed) -1.0 else 1.0
         var power by (
