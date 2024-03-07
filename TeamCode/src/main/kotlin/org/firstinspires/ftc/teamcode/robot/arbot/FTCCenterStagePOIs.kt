@@ -35,8 +35,8 @@ object FTCCenterStagePOIs {
             }
     ]
 
-    private val backdropRed = Vec2(5 * FEET, -3 * FEET)
-    private val backdropBlue = Vec2(5 * FEET, 3 * FEET)
+    private val backdropRed = Vec2(5.333 * FEET, -3 * FEET)
+    private val backdropBlue = Vec2(5.333 * FEET, 3 * FEET)
     private const val backdropWidth = 1 * FEET
 
     fun facingBackdropFromDistance(alliance: Alliance, distance: Double, strafe: Double = 0.0): Vec2 {

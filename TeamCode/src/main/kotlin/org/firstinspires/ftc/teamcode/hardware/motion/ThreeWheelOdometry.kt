@@ -24,7 +24,7 @@ y ^
 */
 class ThreeWheelOdometry(
         /** Offset of the center of the odometry setup in robot space. */
-        locationOnRobot: Vec2Rot,
+        val locationOnRobot: Vec2Rot,
         /** Offset in the +x direction, facing along the y axis (movement towards +y should be read as positive number) */
         val yReaderPos: Double = 1.0,
         /** Offset in the +y direction, facing along the x axis (movement towards +x should be read as positive number)  */
@@ -131,7 +131,7 @@ class ThreeWheelOdometry(
             val deltaY = deltaYR
             return assembly2robotTransform.transformVelFwd(
                     Vec2Rot(deltaX, deltaY, deltaR)
-            )
+            ) + Vec2Rot(locationOnRobot.v.rotate(-90.0) * deltaR,0.0) // account for moving reference frame
         }
     }
 }

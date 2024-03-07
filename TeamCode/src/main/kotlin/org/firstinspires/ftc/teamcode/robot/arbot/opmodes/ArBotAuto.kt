@@ -13,8 +13,6 @@ import org.firstinspires.ftc.teamcode.util.Vec2
 import org.firstinspires.ftc.teamcode.util.Vec2Rot
 import org.firstinspires.ftc.teamcode.util.promptSelectAlliance
 import org.firstinspires.ftc.teamcode.vision.prop.TeamPropVisProcessor.Loc.*
-import kotlin.math.PI
-import kotlin.math.cos
 
 private val POIs = FTCCenterStagePOIs
 
@@ -70,6 +68,7 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
             groundPlacingDelay = 2.5.seconds
             stationaryLasting(1.0.seconds)
             bezierXY(UntilSinceMark(4.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 + 3.0, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(5.5.seconds), POIs.relativePos(alliance, 24.0 + 9.0 + 3.0, 36.0 + 6.0 - 12.0))
         } else {
             // towards the audience
             bezierR(UntilSinceMark(1.0.seconds), FTCCenterStagePOIs.Facing.Forwards.angle(alliance))
@@ -88,16 +87,16 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         mark()
 
         val backdropXOff = when (detectedLoc) {
-            Left -> 3.0
-            Center -> -1.0
-            Right -> -7.0
+            Left -> 6.0
+            Center -> -2.0
+            Right -> -10.0
         }
-        actAtTSinceMark(0.0.seconds) {
-            robot.outtake.controller.automatedGoToExtension(2.0, 18.0 / cos(40.0 / 180.0 * PI))
+        actAtTSinceMark(2.5.seconds) {
+            robot.outtake.controller.automatedGoToExtension(2.0, 18.0)
         }
         bezierR(Lasting(1.0.seconds), 0.0, 0.0)
         bezierXY(Lasting(2.5.seconds), POIs.facingBackdropFromDistance(alliance, 9.0, strafe = backdropXOff))
-
+        stationaryLasting(2.0.seconds)
 
         // drop held pixels
         mark()
@@ -117,15 +116,15 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         mark()
 
         bezierR(Lasting(1.0.seconds), 0.0, 0.0)
-        bezierXY(Lasting(0.5.seconds),
+        bezierXY(Lasting(0.75.seconds),
                 lastPos.v + Vec2(-8.0, 0.0),
                 Vec2(-12.0, 0.0))
-        bezierXY(Lasting(2.0.seconds),
-                POIs.relativePos(alliance, 44.0, 20.0),
+        bezierXY(Lasting(2.25.seconds),
+                POIs.relativePos(alliance, 44.0, 15.0),
                 POIs.relativeVel(alliance, 10.0, -3.0))
         bezierXY(Lasting(1.5.seconds),
 //                POIs.relativePos(alliance, 72.0 - 11.0, 11.0))
-                POIs.relativePos(alliance, 72.0 - 11.0, 17.0))
+                POIs.relativePos(alliance, 72.0 - 10.0, 10.0))
 
 
         // done, shut down
