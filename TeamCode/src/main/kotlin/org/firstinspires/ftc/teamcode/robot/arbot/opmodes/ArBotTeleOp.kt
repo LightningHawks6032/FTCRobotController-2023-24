@@ -27,7 +27,7 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val withDriveStatus = WithTelemetry.Partial()
     val withControlStatus = WithTelemetry.Partial()
 
-    var lifterArmRaise = 0.0
+    var lifterArmHold = false
 
     createLoop {
         val slowA = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
@@ -37,8 +37,17 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         // thing controls
 
         // ---------- SUSPEND ----------- //
-        robot.lifter.raiseArm = slowMultiplierA * gamepadA.dpad.let { (if (it.right.isHeld) 1.0 else 0.0) - (if (it.left.isHeld) 1.0 else 0.0) }
-        robot.lifter.liftPower = slowMultiplierA * gamepadA.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
+//        robot.lifter.raiseArm = slowMultiplierA * gamepadA.dpad.let { (if (it.right.isHeld) 1.0 else 0.0) - (if (it.left.isHeld) 1.0 else 0.0) }
+        robot.lifter.liftPower = (gamepadA.dpad.let { (if (it.up.isHeld) 1 else 0) - (if (it.down.isHeld) 1 else 0) }).let {
+            if (it == 0 && lifterArmHold) {
+                0.3
+            } else {
+                it.toDouble()
+            }
+        }
+        if (gamepadA.dpad.up.isHeld) {
+            lifterArmHold = gamepadA.a.isHeld
+        }
 
         // ---------- PLANES ----------- //
         robot.planeLauncher.launch = gamepadB.b.isHeld
