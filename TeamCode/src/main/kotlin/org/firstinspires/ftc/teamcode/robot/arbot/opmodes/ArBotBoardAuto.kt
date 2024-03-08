@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.vision.prop.TeamPropVisProcessor.Loc.*
 private val POIs = FTCCenterStagePOIs
 
 @Autonomous
-class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
+class ArBotBoardAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     robot.groundPixel.hold = true
 
     val alliance = promptSelectAlliance()
@@ -57,14 +57,14 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         if (detectedLoc == Center) {
             // towards the opponent
             bezierR(UntilSinceMark(1.0.seconds), FTCCenterStagePOIs.Facing.Self.angle(alliance))
-            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 12.0, 48.0 - 9.0 + 3.5))
+            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 12.0, 48.0 - 9.0 + 1.5))
             groundPlacingDelay = 1.5.seconds
             stationaryLasting(1.0.seconds)
             bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 15.0, 48.0 - 9.0 - 6.0))
         } else if ((detectedLoc == Right) == (alliance == Alliance.Red)) {
             // towards the pixel board
             bezierR(UntilSinceMark(2.0.seconds), FTCCenterStagePOIs.Facing.Forwards.angle(alliance))
-            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 - 3.5, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(2.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 - 1.5, 36.0 + 6.0))
             groundPlacingDelay = 2.5.seconds
             stationaryLasting(1.0.seconds)
             bezierXY(UntilSinceMark(4.0.seconds), POIs.relativePos(alliance, 24.0 + 9.0 + 3.0, 36.0 + 6.0))
@@ -72,10 +72,10 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         } else {
             // towards the audience
             bezierR(UntilSinceMark(1.0.seconds), FTCCenterStagePOIs.Facing.Forwards.angle(alliance))
-            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 - 3.5, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(1.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 - 1.5, 48.0 - 10.5)) // 36.0 + 6.0
             groundPlacingDelay = 1.5.seconds
             stationaryLasting(1.0.seconds)
-            bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 + 3.0, 36.0 + 6.0))
+            bezierXY(UntilSinceMark(3.0.seconds), POIs.relativePos(alliance, 1.0 + 9.0 + 3.0, 48.0 - 10.5)) // 36.0 + 6.0
 
         }
         actAtTSinceMark(groundPlacingDelay) {
@@ -87,15 +87,15 @@ class ArBotAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         mark()
 
         val backdropXOff = when (detectedLoc) {
-            Left -> 6.0
+            Left -> 5.0
             Center -> -2.0
-            Right -> -10.0
+            Right -> -8.0
         }
         actAtTSinceMark(2.5.seconds) {
-            robot.outtake.controller.automatedGoToExtension(2.0, 18.0)
+            robot.outtake.controller.automatedGoToExtension(2.0, 22.0)
         }
         bezierR(Lasting(1.0.seconds), 0.0, 0.0)
-        bezierXY(Lasting(2.5.seconds), POIs.facingBackdropFromDistance(alliance, 9.0, strafe = backdropXOff))
+        bezierXY(Lasting(2.5.seconds), POIs.facingBackdropFromDistance(alliance, 10.0, strafe = backdropXOff))
         stationaryLasting(2.0.seconds)
 
         // drop held pixels

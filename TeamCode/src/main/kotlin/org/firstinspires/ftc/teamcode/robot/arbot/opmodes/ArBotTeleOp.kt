@@ -27,6 +27,8 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
     val withDriveStatus = WithTelemetry.Partial()
     val withControlStatus = WithTelemetry.Partial()
 
+    var lifterArmRaise = 0.0
+
     createLoop {
         val slowA = !gamepadA.bumper.let { it.left.isHeld || it.right.isHeld }
         val slowMultiplierA = if (slowA) 0.1 else 0.3
@@ -35,8 +37,8 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         // thing controls
 
         // ---------- SUSPEND ----------- //
-        robot.lifter.raiseArm = gamepadA.dpad.let { (if (it.right.isHeld) 1.0 else 0.0) - (if (it.left.isHeld) 1.0 else 0.0) }
-        robot.lifter.liftPower = gamepadA.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
+        robot.lifter.raiseArm = slowMultiplierA * gamepadA.dpad.let { (if (it.right.isHeld) 1.0 else 0.0) - (if (it.left.isHeld) 1.0 else 0.0) }
+        robot.lifter.liftPower = slowMultiplierA * gamepadA.dpad.let { (if (it.up.isHeld) 1.0 else 0.0) - (if (it.down.isHeld) 1.0 else 0.0) }
 
         // ---------- PLANES ----------- //
         robot.planeLauncher.launch = gamepadB.b.isHeld
@@ -74,17 +76,18 @@ class ArBotTeleOp : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 //        if (outtakeX + outtakeV * 0.5 < 10.0) {
 //            robot.outtake.outtakeTilt = false
 //        }
-        robot.outtake.dropOpen = gamepadB.a.isHeld
         // reset slide position
         if (gamepadB.y.isHeld && outtakeX < 4.0) {
-            robot.outtake.pos = 0.0
+            robot.outtake.dropOpen = false
+            robot.outtake.pos
             @OptIn(NotForCompetition::class)
             robot.outtake.debugLifterPower = -1.0
         } else {
+            robot.outtake.dropOpen = gamepadB.a.isHeld
             robot.outtake.tick(dt)
         }
 
-        robot.groundPixel.hold = !gamepadA.y.isHeld
+        robot.groundPixel.hold = gamepadA.y.isHeld
 
         withControlStatus {
 //            ln("intake", intakeX)
