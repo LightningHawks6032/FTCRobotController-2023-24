@@ -21,11 +21,16 @@ class ArBotAudienceAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
 
     val alliance = promptSelectAlliance()
     var detectedLoc = TeamPropVisProcessor.Loc.Center
+    var inputAxesFunctional = false
+    createLoop(condition = {duringInit}) {
+        inputAxesFunctional = robot.drive.checkInputAxesFunctional()
+    }
     robot.createTeamPropDetectionVisionLoop(this, alliance, { duringInit }) { loc ->
         detectedLoc = loc
         withTelemetry {
             ln("Alliance: $alliance")
             ln("Detected team prop location: $loc")
+            ln("Input functioning: $inputAxesFunctional")
         }
     }
 
@@ -82,13 +87,13 @@ class ArBotAudienceAuto : LOpMode<ArBotRobot.Impl>(ArBotRobot, {
         }
 
 
-        // parking in thingy
-        mark()
-
-
-        bezierXY(UntilSinceMark(4.0.seconds),
-                POIs.relativePos(alliance, 10.0 - 6.0 * 12.0, 10.0))
-
+//        // parking in thingy
+//        mark()
+//
+//
+//        bezierXY(UntilSinceMark(4.0.seconds),
+//                POIs.relativePos(alliance, 10.0 - 6.0 * 12.0, 10.0))
+//
 
         // done, shut down
         mark()

@@ -62,6 +62,8 @@ class CompoundOdometry(
         }
     }
 
+    override fun axesFunctional() = loPassOdo.axesFunctional() || hiPassOdo.axesFunctional()
+
     override fun assertPosition(newPos: Vec2Rot) {
         pos = newPos
         vel = Vec2Rot.zero

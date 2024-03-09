@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.util.Vec2Rot
  */
 abstract class IOdometry {
 
+    open fun axesFunctional() = false
+
     /** Field-relative robot acceleration. */
     var acc = Vec2Rot.zero
         protected set

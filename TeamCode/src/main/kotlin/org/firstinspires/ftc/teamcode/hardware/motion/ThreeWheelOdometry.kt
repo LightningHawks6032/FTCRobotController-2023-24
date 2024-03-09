@@ -42,6 +42,12 @@ class ThreeWheelOdometry(
 
     val assembly2robotTransform = Transform2D.local2outerFromLocation(locationOnRobot)
 
+    var x0nz = 0
+    var x1nz = 0
+    var ynz = 0
+
+    override fun axesFunctional() = x0nz > 10 && x1nz > 10 && ynz > 10
+
     data class ReversalPattern(
             val y: Boolean = false,
             val x0: Boolean = false,
@@ -107,6 +113,11 @@ class ThreeWheelOdometry(
             var deltaX0 = deltaX0 * wheelRadiiInches
             var deltaX1 = deltaX1 * wheelRadiiInches
             var deltaYR = deltaY * wheelRadiiInches
+
+            println("DELTA x0:$deltaX0 x1:$deltaX1 y:$deltaYR")
+            if (deltaX0 != 0.0) x0nz += 1
+            if (deltaX1 != 0.0) x1nz += 1
+            if (deltaYR != 0.0) ynz += 1
 
             // vx0 = -vr * x0p + vx ; vr = (vx - vx0) / x0p ; vx = vx0 + vr * x0p
             // vx1 = -vr * x1p + vx ; vr = (vx - vx1) / x1p ; vx = vx1 + vr * x1p

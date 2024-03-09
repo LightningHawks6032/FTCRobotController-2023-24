@@ -17,6 +17,8 @@ class DriveController(
         /** Default scale for the PID force, linear part in Newtons, angular part in Newton-cm*/
         val forceMagnitude: Vec2Rot,
 ) {
+    fun checkInputAxesFunctional() = input.axesFunctional()
+
     @NotForCompetition
     fun debugTakeControl(): Pair<IOdometry, IDrive> {
         disableTicking = true
